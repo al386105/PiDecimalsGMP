@@ -1,5 +1,5 @@
-#ifndef BBP_ALGORITHM
-#define BBP_ALGORITHM
+#ifndef PI_CALCULATOR
+#define PI_CALCULATOR
 
 void sequentialPiCalculation();
 void parallelPiCalculation();

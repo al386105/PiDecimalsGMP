@@ -38,7 +38,7 @@ void sequentialPiCalculation(int algorithm, int precision){
         numIterations = precision;
         BBPAlgorithm_SequentialImplementation(pi, numIterations);
     } else {
-        numIterations = precision / 14;
+        numIterations = (precision / 14) + 1;
         ChudnovskyAlgorithm_SequentialImplementation(pi, numIterations);
     }
     
