@@ -57,7 +57,7 @@ void BBPAlgorithm_ParallelImplementation(mpf_t pi, int numIterations, int numThr
     //Set the number of threads 
     omp_set_num_threads(numThreads);
 
-    #pragma omp parallel private(myId)
+    #pragma omp parallel private(myId, i)
     {
         myId = omp_get_thread_num();
         mpf_t piLocal, m;
