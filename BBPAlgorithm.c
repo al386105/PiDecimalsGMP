@@ -4,7 +4,7 @@
 #include <omp.h>
 
 
-void BPP_iteration(mpf_t pi, int n, mpf_t jump, mpf_t m){
+void BBP_iteration(mpf_t pi, int n, mpf_t jump, mpf_t m){
     mpf_t a, b, c, d, aux;
     mpf_init_set_ui(a, 4.0);        // (  4 / 8n + 1))
     mpf_init_set_ui(b, 2.0);        // ( -2 / 8n + 4))
@@ -41,7 +41,7 @@ void BBPAlgorithm_SequentialImplementation(mpf_t pi, int numIterations){
 
     int i;
     for(i = 0; i < numIterations; i++){
-        BPP_iteration(pi, i, quotient, m);    
+        BBP_iteration(pi, i, quotient, m);    
     }
 
 }
@@ -68,13 +68,13 @@ void BBPAlgorithm_ParallelImplementation(mpf_t pi, int numIterations, int numThr
         //First Phase -> Working on a local variable        
         #pragma omp parallel for 
             for(i = myId; i < numIterations; i+=numThreads){
-                BPP_iteration(piLocal, i, jump, m);    
+                BBP_iteration(piLocal, i, jump, m);    
             }
 
         //Second Phase -> Accumulate the result in the global variable
         #pragma omp critical
         mpf_add(pi, pi, piLocal);
-        
+
         //Clear memory
         mpf_clear(piLocal);   
         mpf_clear(m);
