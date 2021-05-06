@@ -3,12 +3,17 @@
 #include <time.h>
 #include "PiCalculator.h"
 
-/*  Compiling the file: gcc -fopenmp PiCalculator.c BPPAlgorithm.c ... -o PiDecimals -lgmp 
-    Executing: ./PiDecimals algorithm precision numThreads
-        Algorithm can be:
+/*************************************************************************************************
+                                                                                                
+    Compiling the file: gcc -fopenmp PiCalculator.c BPPAlgorithm.c ... -o PiDecimals -lgmp       
+    Executing: ./PiDecimals algorithm precision numThreads                                       
+        Algorithm can be:                                                                           
         0 -> BBP (Bailey-Borwein-Plouffe)
         1 -> Chudnovsky
-*/  
+ 
+ *************************************************************************************************/  
+
+double gettimeofday();
 
 int incorrectParams(){
     printf("Parametros introducidos incorrectos. Se debe ejcutar como: \n");
@@ -69,6 +74,8 @@ int main(int argc, char **argv){
     if(algorithm == 0) printf("Algoritmo: BBP \n");
     else printf("Algoritmo: Chudnovsky \n");
     printf("Precision: %d \n", precision);
+    if (numThreads > 1) printf("Numero de hebras: %d\n", numThreads);
+    else printf("Numero de hebras: 1\n");
     printf("Tiempo de ejecucion: %f segundos. \n", executionTime);
 
     exit(0);

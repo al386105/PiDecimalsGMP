@@ -36,10 +36,10 @@ void sequentialPiCalculation(int algorithm, int precision){
     int numIterations;
     if(algorithm == 0){ //BBP Algorithm:
         numIterations = precision;
-        BBPAlgorithm_SequentialImplementation(pi, numIterations);
+        BBPAlgorithmSequentialImplementation(pi, numIterations);
     } else {
         numIterations = (precision / 14) + 1;
-        ChudnovskyAlgorithm_SequentialImplementation(pi, numIterations);
+        ChudnovskyAlgorithmSequentialImplementation(pi, numIterations);
     }
     
     checkDecimals(pi);
@@ -56,10 +56,10 @@ void parallelPiCalculation(int algorithm, int precision, int numThreads){
 
     if(algorithm == 0){ //BBP Algorithm:
         numIterations = precision;
-        BBPAlgorithm_ParallelImplementation(pi, numIterations, numThreads);
+        BBPAlgorithmParallelImplementation(pi, numIterations, numThreads);
     } else {
         numIterations = precision / 14;
-        ChudnovskyAlgorithm_ParallelImplementation(pi, numIterations, numThreads);
+        ChudnovskyAlgorithmParallelImplementation(pi, numIterations, numThreads);
     }
     
     checkDecimals(pi);

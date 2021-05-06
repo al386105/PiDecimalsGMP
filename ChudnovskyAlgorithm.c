@@ -3,6 +3,13 @@
 #include <gmp.h>
 #include <omp.h>
 
+/*Chudnovsky formula
+*************************************************************************************
+*     426880 sqrt(10005)                 (6n)! (545140134n + 13591409)              * 
+*    --------------------  = SUMMATORY( ----------------------------- ),  n >=0     *
+*            pi                            (n!)^3 (3n)! (-640320)^3n                *
+*************************************************************************************/
+
 void getFactorials(mpf_t * factorials, int numFactorials){
     int i;
     mpf_t f;
@@ -22,7 +29,7 @@ void clearFactorials(mpf_t * factorials, int numFactorials){
     }
 }
 
-void Chudnovsky_iteration(mpf_t pi, int n, mpf_t depA, mpf_t depB, mpf_t depC, mpf_t depD){
+void ChudnovskyIteration(mpf_t pi, int n, mpf_t depA, mpf_t depB, mpf_t depC, mpf_t depD){
     mpf_t dividend, divisor;
     mpf_init_set_ui(dividend, n);
     mpf_mul_ui(dividend, dividend, 545140134);
@@ -36,10 +43,9 @@ void Chudnovsky_iteration(mpf_t pi, int n, mpf_t depA, mpf_t depB, mpf_t depC, m
     mpf_div(dividend, dividend, divisor);
 
     mpf_add(pi, pi, dividend);
-
 }
 
-void ChudnovskyAlgorithm_SequentialImplementation(mpf_t pi, int precision, int numIterations){
+void ChudnovskyAlgorithmSequentialImplementation(mpf_t pi, int numIterations){
     int numFactorials, i; 
     numFactorials = numIterations * 6;
     mpf_t factorials[numFactorials + 1];
@@ -56,7 +62,7 @@ void ChudnovskyAlgorithm_SequentialImplementation(mpf_t pi, int precision, int n
     mpf_pow_ui(c, c, 3);
 
     for(i = 0; i < numIterations; i ++){
-        Chudnovsky_iteration(pi, i, depA, depB, depC, depD);
+        ChudnovskyIteration(pi, i, depA, depB, depC, depD);
         //Update dependencies
         mpf_set(depA, factorials[6 * (i + 1)]);
         mpf_pow_ui(depB, factorials[i + 1], 3);
@@ -67,11 +73,12 @@ void ChudnovskyAlgorithm_SequentialImplementation(mpf_t pi, int precision, int n
     mpf_mul_ui(aux, aux, 426880);
     mpf_div(pi, aux, pi);    
     
+    //Free memory
     clearFactorials(factorials, numFactorials);
-
+    mpf_clear(depA); mpf_clear(depB); mpf_clear(depC); mpf_clear(depD); mpf_clear(c); mpf_clear(aux);
 }
 
-void ChudnovskyAlgorithm_ParallelImplementation(mpf_t pi, int numIterations, int numThreads){
+void ChudnovskyAlgorithmParallelImplementation(mpf_t pi, int numIterations, int numThreads){
     int numFactorials, i, myId, blockSize, blockStart, blockEnd;
     mpf_t piLocal, depA, depB, depC, depD, c, aux;
     
@@ -79,21 +86,22 @@ void ChudnovskyAlgorithm_ParallelImplementation(mpf_t pi, int numIterations, int
     mpf_t factorials[numFactorials + 1];
     getFactorials(factorials, numFactorials);
 
-    //Set the number of threads 
-    omp_set_num_threads(numThreads);
     blockSize = (numIterations + numThreads - 1) / numThreads;
     mpf_init_set_ui(aux, 10005);
     mpf_init_set_ui(c, 640320);
     mpf_neg(c, c);
     mpf_pow_ui(c, c, 3);
 
+    //Set the number of threads 
+    omp_set_num_threads(numThreads);
+
     #pragma omp parallel private(myId, i, blockStart, blockEnd, piLocal, depA, depB, depC, depD)
     {
         myId = omp_get_thread_num();
-        mpf_init_set_ui(piLocal, 0);    // private thread pi
         blockStart = myId * blockSize;
         blockEnd = (myId == numThreads - 1) ? numIterations : blockStart + blockSize;
         
+        mpf_init_set_ui(piLocal, 0);    // private thread pi
         mpf_init_set(depA, factorials[blockStart * 6]);
         mpf_init_set(depB, factorials[blockStart]);
         mpf_pow_ui(depB, depB, 3);
@@ -105,7 +113,7 @@ void ChudnovskyAlgorithm_ParallelImplementation(mpf_t pi, int numIterations, int
         //First Phase -> Working on a local variable        
         #pragma omp parallel for 
             for(i = blockStart; i < blockEnd; i++){
-                Chudnovsky_iteration(piLocal, i, depA, depB, depC, depD);
+                ChudnovskyIteration(piLocal, i, depA, depB, depC, depD);
                 //Update dependencies
                 mpf_set(depA, factorials[6 * (i + 1)]);
                 mpf_pow_ui(depB, factorials[i + 1], 3);
@@ -113,23 +121,20 @@ void ChudnovskyAlgorithm_ParallelImplementation(mpf_t pi, int numIterations, int
                 mpf_mul(depD, depD, c);
             }
 
-        //Second Phase -> Accumulate the result in the global variable
+        //Second Phase -> Accumulate the result in the global variable 
         #pragma omp critical
         mpf_add(pi, pi, piLocal);
         
-        //Clear memory
-        mpf_clear(piLocal); 
-        mpf_clear(depA);
-        mpf_clear(depB);  
-        mpf_clear(depC);  
-        mpf_clear(depD);  
+        //Free memory
+        mpf_clear(piLocal); mpf_clear(depA); mpf_clear(depB); mpf_clear(depC); mpf_clear(depD);  
     }
 
     mpf_sqrt(aux, aux);
     mpf_mul_ui(aux, aux, 426880);
     mpf_div(pi, aux, pi);    
     
+    //Free memory
     clearFactorials(factorials, numFactorials);
-    mpf_clear(aux);  
+    mpf_clear(c); mpf_clear(aux);
 }
 

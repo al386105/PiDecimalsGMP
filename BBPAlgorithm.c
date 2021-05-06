@@ -3,8 +3,14 @@
 #include <gmp.h>
 #include <omp.h>
 
+/*Bailey Borwein Plouffe formula
+*************************************************************************************
+*                      1        4          2        1       1                       * 
+*    pi = SUMMATORY( ------ [ ------  - ------ - ------ - ------]),  n >=0          *
+*                     16^n    8n + 1    8n + 4   8n + 5   8n + 6                    *
+*************************************************************************************/
 
-void BBP_iteration(mpf_t pi, int n, mpf_t jump, mpf_t m){
+void BBPIteration(mpf_t pi, int n, mpf_t jump, mpf_t m){
     mpf_t a, b, c, d, aux;
     mpf_init_set_ui(a, 4.0);        // (  4 / 8n + 1))
     mpf_init_set_ui(b, 2.0);        // ( -2 / 8n + 4))
@@ -19,10 +25,9 @@ void BBP_iteration(mpf_t pi, int n, mpf_t jump, mpf_t m){
     mpf_div_ui(d, d, i + 6.0);      // d = 1 / (8n + 6)
 
     // aux = (a - b - c - d)   
-    mpf_add(aux, aux, a);
-    mpf_sub(aux, aux, b);
+    mpf_sub(aux, a, b);
     mpf_sub(aux, aux, c);
-    mpf_sub(aux, aux, d); 
+    mpf_sub(aux, aux, d);
 
     // aux = m * aux
     mpf_mul(aux, aux, m);   
@@ -33,20 +38,20 @@ void BBP_iteration(mpf_t pi, int n, mpf_t jump, mpf_t m){
     mpf_mul(m, m, jump);  
 }
 
-void BBPAlgorithm_SequentialImplementation(mpf_t pi, int numIterations){
+void BBPAlgorithmSequentialImplementation(mpf_t pi, int numIterations){
    double q = 1.0 / 16.0;
     mpf_t m, quotient;           
     mpf_init_set_ui(m, 1);          // m = (1/16)^n
-    mpf_init_set_d(quotient, q);   // quotient = (1/16)      
+    mpf_init_set_d(quotient, q);    // quotient = (1/16)      
 
     int i;
     for(i = 0; i < numIterations; i++){
-        BBP_iteration(pi, i, quotient, m);    
+        BBPIteration(pi, i, quotient, m);    
     }
 
 }
 
-void BBPAlgorithm_ParallelImplementation(mpf_t pi, int numIterations, int numThreads){
+void BBPAlgorithmParallelImplementation(mpf_t pi, int numIterations, int numThreads){
     int myId, i;
     double q = 1.0 / 16.0;
     mpf_t jump, quotient; 
@@ -68,7 +73,7 @@ void BBPAlgorithm_ParallelImplementation(mpf_t pi, int numIterations, int numThr
         //First Phase -> Working on a local variable        
         #pragma omp parallel for 
             for(i = myId; i < numIterations; i+=numThreads){
-                BBP_iteration(piLocal, i, jump, m);    
+                BBPIteration(piLocal, i, jump, m);    
             }
 
         //Second Phase -> Accumulate the result in the global variable
@@ -77,8 +82,7 @@ void BBPAlgorithm_ParallelImplementation(mpf_t pi, int numIterations, int numThr
 
         //Clear memory
         mpf_clear(piLocal);   
-        mpf_clear(m);
-                
+        mpf_clear(m);     
     }
         
     //Clear memory
