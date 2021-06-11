@@ -19,10 +19,10 @@ void BBPIteration(mpf_t pi, int n, mpf_t jump, mpf_t m){
     mpf_init_set_ui(aux, 0);        // (a + b + c + d)  
 
     int i = n << 3;                 // i = n * 8 
-    mpf_div_ui(a, a, i + 1.0);      // a = 4 / (8n + 1)
-    mpf_div_ui(b, b, i + 4.0);      // b = 2 / (8n + 4)
-    mpf_div_ui(c, c, i + 5.0);      // c = 1 / (8n + 5)
-    mpf_div_ui(d, d, i + 6.0);      // d = 1 / (8n + 6)
+    mpf_div_ui(a, a, i | 1);      // a = 4 / (8n + 1), i + 1 => i | 1
+    mpf_div_ui(b, b, i | 4);      // b = 2 / (8n + 4), i + 4 => i | 4
+    mpf_div_ui(c, c, i | 5);      // c = 1 / (8n + 5), i + 5 => i | 5
+    mpf_div_ui(d, d, i | 6);      // d = 1 / (8n + 6), i + 6 => i | 6
 
     // aux = (a - b - c - d)   
     mpf_sub(aux, a, b);
@@ -38,7 +38,7 @@ void BBPIteration(mpf_t pi, int n, mpf_t jump, mpf_t m){
     mpf_mul(m, m, jump);  
 }
 
-void BBPAlgorithmSequentialImplementation(mpf_t pi, int numIterations){
+void SequentialBBPAlgorithm(mpf_t pi, int numIterations){
    double q = 1.0 / 16.0;
     mpf_t m, quotient;           
     mpf_init_set_ui(m, 1);          // m = (1/16)^n
@@ -51,7 +51,7 @@ void BBPAlgorithmSequentialImplementation(mpf_t pi, int numIterations){
 
 }
 
-void BBPAlgorithmParallelImplementation(mpf_t pi, int numIterations, int numThreads){
+void ParallelBBPAlgorithm(mpf_t pi, int numIterations, int numThreads){
     int myId, i;
     double q = 1.0 / 16.0;
     mpf_t jump, quotient; 

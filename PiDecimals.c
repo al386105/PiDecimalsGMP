@@ -18,7 +18,7 @@ double gettimeofday();
 int incorrectParams(){
     printf("Parametros introducidos incorrectos. Se debe ejcutar como: \n");
     printf(" ./PiDecimals algorithm precision numThreads \n");
-    printf("    Algorithm can be: ");
+    printf("    Algorithm can be: \n");
     printf("        0 -> BBP (Bailey-Borwein-Plouffe) \n");
     printf("        1 -> Chudnovsky \n"); 
 }
@@ -50,7 +50,7 @@ int main(int argc, char **argv){
     //Take operation, precision, number of iterations and number of threads from params
     int algorithm = atoi(argv[1]);    
     int precision = atoi(argv[2]);
-    int numThreads = atoi(argv[3]);
+    int numThreads = (atoi(argv[3]) <= 0) ? 1 : atoi(argv[3]);
 
 
     //Declare clock variables and start time
@@ -58,14 +58,14 @@ int main(int argc, char **argv){
     struct timeval t1, t2; 
     gettimeofday(&t1, NULL);
 
-    if (numThreads <= 1){
-        printf("----IMPLEMENTACION SECUENCIAL----\n");
-        sequentialPiCalculation(algorithm, precision); 
-
-    } else {      
-        printf("----IMPLEMENTACION PARALELA----\n");   
-        parallelPiCalculation(algorithm, precision, numThreads); 
-    } 
+    if (algorithm == 0){
+        BBPAlgorithm(numThreads, precision); 
+    } else if (algorithm == 1) {      
+        ChudnovskyAlgorithm(numThreads, precision); 
+    } else {
+        incorrectParams();
+        exit(-1);
+    }
     
     gettimeofday(&t2, NULL);
     executionTime = ((t2.tv_sec - t1.tv_sec) * 1000000u +  t2.tv_usec - t1.tv_usec)/1.e6; 
@@ -74,8 +74,7 @@ int main(int argc, char **argv){
     if(algorithm == 0) printf("Algoritmo: BBP \n");
     else printf("Algoritmo: Chudnovsky \n");
     printf("Precision: %d \n", precision);
-    if (numThreads > 1) printf("Numero de hebras: %d\n", numThreads);
-    else printf("Numero de hebras: 1\n");
+    printf("Numero de hebras: %d\n", numThreads);
     printf("Tiempo de ejecucion: %f segundos. \n", executionTime);
 
     exit(0);

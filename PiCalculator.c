@@ -28,18 +28,17 @@ void checkDecimals(mpf_t pi){
     fclose(file);
 }
 
-void sequentialPiCalculation(int algorithm, int precision){
+void BBPAlgorithm(int numThreads, int precision){
     //Set gmp float precision (in bits) and init pi
     mpf_set_default_prec(precision * 8); 
     mpf_t pi;
     mpf_init_set_ui(pi, 0);
-    int numIterations;
-    if(algorithm == 0){ //BBP Algorithm:
-        numIterations = precision;
-        BBPAlgorithmSequentialImplementation(pi, numIterations);
+    int numIterations = precision;
+    
+    if(numThreads <= 1){ 
+        SequentialBBPAlgorithm(pi, numIterations);
     } else {
-        numIterations = (precision / 14) + 1;
-        ChudnovskyAlgorithmSequentialImplementation(pi, numIterations);
+        ParallelBBPAlgorithm(pi, numIterations, numThreads);
     }
     
     checkDecimals(pi);
@@ -47,19 +46,17 @@ void sequentialPiCalculation(int algorithm, int precision){
     mpf_clear(pi);
 }
 
-void parallelPiCalculation(int algorithm, int precision, int numThreads){
+void ChudnovskyAlgorithm(int numThreads, int precision){
     //Set gmp float precision (in bits) and init pi
     mpf_set_default_prec(precision * 8); 
     mpf_t pi;
     mpf_init_set_ui(pi, 0);
-    int numIterations;
+    int numIterations = (precision + 14 - 1) / 14;  //Division por exceso
 
-    if(algorithm == 0){ //BBP Algorithm:
-        numIterations = precision;
-        BBPAlgorithmParallelImplementation(pi, numIterations, numThreads);
+    if(numThreads <= 1){ 
+        SequentialChudnovskyAlgorithm(pi, numIterations);
     } else {
-        numIterations = precision / 14;
-        ChudnovskyAlgorithmParallelImplementation(pi, numIterations, numThreads);
+        ParallelChudnovskyAlgorithm(pi, numIterations, numThreads);
     }
     
     checkDecimals(pi);

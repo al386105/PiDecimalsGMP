@@ -45,7 +45,7 @@ void ChudnovskyIteration(mpf_t pi, int n, mpf_t depA, mpf_t depB, mpf_t depC, mp
     mpf_add(pi, pi, dividend);
 }
 
-void ChudnovskyAlgorithmSequentialImplementation(mpf_t pi, int numIterations){
+void SequentialChudnovskyAlgorithm(mpf_t pi, int numIterations){
     int numFactorials, i; 
     numFactorials = numIterations * 6;
     mpf_t factorials[numFactorials + 1];
@@ -78,7 +78,7 @@ void ChudnovskyAlgorithmSequentialImplementation(mpf_t pi, int numIterations){
     mpf_clear(depA); mpf_clear(depB); mpf_clear(depC); mpf_clear(depD); mpf_clear(c); mpf_clear(aux);
 }
 
-void ChudnovskyAlgorithmParallelImplementation(mpf_t pi, int numIterations, int numThreads){
+void ParallelChudnovskyAlgorithm(mpf_t pi, int numIterations, int numThreads){
     int numFactorials, i, myId, blockSize, blockStart, blockEnd;
     mpf_t piLocal, depA, depB, depC, depD, c, aux;
     

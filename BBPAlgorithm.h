@@ -1,8 +1,8 @@
 #ifndef BBP_ALGORITHM
 #define BBP_ALGORITHM
 
-void BBPAlgorithmSequentialImplementation();
-void BBPAlgorithmParallelImplementation();
+void SequentialBBPAlgorithm();
+void ParallelBBPAlgorithm();
 
 #endif
 

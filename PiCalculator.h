@@ -1,8 +1,8 @@
 #ifndef PI_CALCULATOR
 #define PI_CALCULATOR
 
-void sequentialPiCalculation();
-void parallelPiCalculation();
+void BBPAlgorithm();
+void ChudnovskyAlgorithm();
 
 #endif
 
