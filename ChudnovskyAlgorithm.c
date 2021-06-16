@@ -10,131 +10,131 @@
 *            pi                            (n!)^3 (3n)! (-640320)^3n                *
 *************************************************************************************/
 
-void getFactorials(mpf_t * factorials, int numFactorials){
+void getFactorials(mpf_t * factorials, int num_factorials){
     int i;
     mpf_t f;
     mpf_init_set_ui(f, 1);
     mpf_init_set_ui(factorials[0], 1);
-    for(i = 1; i <= numFactorials; i++){
+    for(i = 1; i <= num_factorials; i++){
         mpf_mul_ui(f, f, i);
         mpf_init_set(factorials[i], f);
     }
     mpf_clear(f);
 }
 
-void clearFactorials(mpf_t * factorials, int numFactorials){
+void clearFactorials(mpf_t * factorials, int num_factorials){
     int i;
-    for(i = 0; i <= numFactorials; i++){
+    for(i = 0; i <= num_factorials; i++){
         mpf_clear(factorials[i]);
     }
 }
 
-void ChudnovskyIteration(mpf_t pi, int n, mpf_t depA, mpf_t depB, mpf_t depC, mpf_t depD){
+void ChudnovskyIteration(mpf_t pi, int n, mpf_t dep_a, mpf_t dep_b, mpf_t dep_c, mpf_t dep_d){
     mpf_t dividend, divisor;
     mpf_init_set_ui(dividend, n);
     mpf_mul_ui(dividend, dividend, 545140134);
     mpf_add_ui(dividend, dividend, 13591409);
-    mpf_mul(dividend, dividend, depA);
+    mpf_mul(dividend, dividend, dep_a);
 
     mpf_init_set_ui(divisor, 0);
-    mpf_mul(divisor, depB, depC);
-    mpf_mul(divisor, divisor, depD);
+    mpf_mul(divisor, dep_b, dep_c);
+    mpf_mul(divisor, divisor, dep_d);
 
     mpf_div(dividend, dividend, divisor);
 
     mpf_add(pi, pi, dividend);
 }
 
-void SequentialChudnovskyAlgorithm(mpf_t pi, int numIterations){
-    int numFactorials, i; 
-    numFactorials = numIterations * 6;
-    mpf_t factorials[numFactorials + 1];
-    getFactorials(factorials, numFactorials);   
+void SequentialChudnovskyAlgorithm(mpf_t pi, int num_iterations){
+    int num_factorials, i; 
+    num_factorials = num_iterations * 6;
+    mpf_t factorials[num_factorials + 1];
+    getFactorials(factorials, num_factorials);   
 
-    mpf_t depA, depB, depC, depD, aux, c;
-    mpf_init_set_ui(depA, 1);
-    mpf_init_set_ui(depB, 1);
-    mpf_init_set_ui(depC, 1);
-    mpf_init_set_ui(depD, 1);
+    mpf_t dep_a, dep_b, dep_c, dep_d, aux, c;
+    mpf_init_set_ui(dep_a, 1);
+    mpf_init_set_ui(dep_b, 1);
+    mpf_init_set_ui(dep_c, 1);
+    mpf_init_set_ui(dep_d, 1);
     mpf_init_set_ui(aux, 10005);
     mpf_init_set_ui(c, 640320);
     mpf_neg(c, c);
     mpf_pow_ui(c, c, 3);
 
-    for(i = 0; i < numIterations; i ++){
-        ChudnovskyIteration(pi, i, depA, depB, depC, depD);
+    for(i = 0; i < num_iterations; i ++){
+        ChudnovskyIteration(pi, i, dep_a, dep_b, dep_c, dep_d);
         //Update dependencies
-        mpf_set(depA, factorials[6 * (i + 1)]);
-        mpf_pow_ui(depB, factorials[i + 1], 3);
-        mpf_set(depC, factorials[3 * (i + 1)]);
-        mpf_mul(depD, depD, c);
+        mpf_set(dep_a, factorials[6 * (i + 1)]);
+        mpf_pow_ui(dep_b, factorials[i + 1], 3);
+        mpf_set(dep_c, factorials[3 * (i + 1)]);
+        mpf_mul(dep_d, dep_d, c);
     }
     mpf_sqrt(aux, aux);
     mpf_mul_ui(aux, aux, 426880);
     mpf_div(pi, aux, pi);    
     
-    //Free memory
-    clearFactorials(factorials, numFactorials);
-    mpf_clear(depA); mpf_clear(depB); mpf_clear(depC); mpf_clear(depD); mpf_clear(c); mpf_clear(aux);
+    //Clear memory
+    clearFactorials(factorials, num_factorials);
+    mpf_clear(dep_a); mpf_clear(dep_b); mpf_clear(dep_c); mpf_clear(dep_d); mpf_clear(c); mpf_clear(aux);
 }
 
-void ParallelChudnovskyAlgorithm(mpf_t pi, int numIterations, int numThreads){
-    int numFactorials, i, myId, blockSize, blockStart, blockEnd;
-    mpf_t piLocal, depA, depB, depC, depD, c, aux;
+void ParallelChudnovskyAlgorithm(mpf_t pi, int num_iterations, int num_threads){
+    int num_factorials, i, thread_id, block_size, block_start, block_end;
+    mpf_t local_pi, dep_a, dep_b, dep_c, dep_d, c, aux;
     
-    numFactorials = numIterations * 6;
-    mpf_t factorials[numFactorials + 1];
-    getFactorials(factorials, numFactorials);
+    num_factorials = num_iterations * 6;
+    mpf_t factorials[num_factorials + 1];
+    getFactorials(factorials, num_factorials);
 
-    blockSize = (numIterations + numThreads - 1) / numThreads;
+    block_size = (num_iterations + num_threads - 1) / num_threads;
     mpf_init_set_ui(aux, 10005);
     mpf_init_set_ui(c, 640320);
     mpf_neg(c, c);
     mpf_pow_ui(c, c, 3);
 
     //Set the number of threads 
-    omp_set_num_threads(numThreads);
+    omp_set_num_threads(num_threads);
 
-    #pragma omp parallel private(myId, i, blockStart, blockEnd, piLocal, depA, depB, depC, depD)
+    #pragma omp parallel private(thread_id, i, block_start, block_end, local_pi, dep_a, dep_b, dep_c, dep_d)
     {
-        myId = omp_get_thread_num();
-        blockStart = myId * blockSize;
-        blockEnd = (myId == numThreads - 1) ? numIterations : blockStart + blockSize;
+        thread_id = omp_get_thread_num();
+        block_start = thread_id * block_size;
+        block_end = (thread_id == num_threads - 1) ? num_iterations : block_start + block_size;
         
-        mpf_init_set_ui(piLocal, 0);    // private thread pi
-        mpf_init_set(depA, factorials[blockStart * 6]);
-        mpf_init_set(depB, factorials[blockStart]);
-        mpf_pow_ui(depB, depB, 3);
-        mpf_init_set(depC, factorials[blockStart * 3]);
-        mpf_init_set_ui(depD, 640320);
-        mpf_neg(depD, depD);
-        mpf_pow_ui(depD, depD, blockStart * 3);
+        mpf_init_set_ui(local_pi, 0);    // private thread pi
+        mpf_init_set(dep_a, factorials[block_start * 6]);
+        mpf_init_set(dep_b, factorials[block_start]);
+        mpf_pow_ui(dep_b, dep_b, 3);
+        mpf_init_set(dep_c, factorials[block_start * 3]);
+        mpf_init_set_ui(dep_d, 640320);
+        mpf_neg(dep_d, dep_d);
+        mpf_pow_ui(dep_d, dep_d, block_start * 3);
 
         //First Phase -> Working on a local variable        
         #pragma omp parallel for 
-            for(i = blockStart; i < blockEnd; i++){
-                ChudnovskyIteration(piLocal, i, depA, depB, depC, depD);
+            for(i = block_start; i < block_end; i++){
+                ChudnovskyIteration(local_pi, i, dep_a, dep_b, dep_c, dep_d);
                 //Update dependencies
-                mpf_set(depA, factorials[6 * (i + 1)]);
-                mpf_pow_ui(depB, factorials[i + 1], 3);
-                mpf_set(depC, factorials[3 * (i + 1)]);
-                mpf_mul(depD, depD, c);
+                mpf_set(dep_a, factorials[6 * (i + 1)]);
+                mpf_pow_ui(dep_b, factorials[i + 1], 3);
+                mpf_set(dep_c, factorials[3 * (i + 1)]);
+                mpf_mul(dep_d, dep_d, c);
             }
 
         //Second Phase -> Accumulate the result in the global variable 
         #pragma omp critical
-        mpf_add(pi, pi, piLocal);
+        mpf_add(pi, pi, local_pi);
         
-        //Free memory
-        mpf_clear(piLocal); mpf_clear(depA); mpf_clear(depB); mpf_clear(depC); mpf_clear(depD);  
+        //Clear memory
+        mpf_clear(local_pi); mpf_clear(dep_a); mpf_clear(dep_b); mpf_clear(dep_c); mpf_clear(dep_d);  
     }
 
     mpf_sqrt(aux, aux);
     mpf_mul_ui(aux, aux, 426880);
     mpf_div(pi, aux, pi);    
     
-    //Free memory
-    clearFactorials(factorials, numFactorials);
+    //Clear memory
+    clearFactorials(factorials, num_factorials);
     mpf_clear(c); mpf_clear(aux);
 }
 

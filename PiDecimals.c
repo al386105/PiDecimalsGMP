@@ -6,7 +6,7 @@
 /*************************************************************************************************
                                                                                                 
     Compiling the file: gcc -fopenmp PiCalculator.c BPPAlgorithm.c ... -o PiDecimals -lgmp       
-    Executing: ./PiDecimals algorithm precision numThreads                                       
+    Executing: ./PiDecimals algorithm precision num_threads                                       
         Algorithm can be:                                                                           
         0 -> BBP (Bailey-Borwein-Plouffe)
         1 -> Chudnovsky
@@ -17,10 +17,11 @@ double gettimeofday();
 
 int incorrectParams(){
     printf("Parametros introducidos incorrectos. Se debe ejcutar como: \n");
-    printf(" ./PiDecimals algorithm precision numThreads \n");
+    printf(" ./PiDecimals algorithm precision num_threads \n");
     printf("    Algorithm can be: \n");
-    printf("        0 -> BBP (Bailey-Borwein-Plouffe) \n");
-    printf("        1 -> Chudnovsky \n"); 
+    printf("        0 -> BBP (Bailey-Borwein-Plouffe) Version 1 \n");
+    printf("        1 -> BBP (Bailey-Borwein-Plouffe) \n");
+    printf("        2 -> Chudnovsky \n"); 
 }
 
 void piDecimalsTitle(){
@@ -50,32 +51,41 @@ int main(int argc, char **argv){
     //Take operation, precision, number of iterations and number of threads from params
     int algorithm = atoi(argv[1]);    
     int precision = atoi(argv[2]);
-    int numThreads = (atoi(argv[3]) <= 0) ? 1 : atoi(argv[3]);
-
+    int num_threads = (atoi(argv[3]) <= 0) ? 1 : atoi(argv[3]);
 
     //Declare clock variables and start time
-    double executionTime;
+    double execution_time;
     struct timeval t1, t2; 
     gettimeofday(&t1, NULL);
 
-    if (algorithm == 0){
-        BBPAlgorithm(numThreads, precision); 
-    } else if (algorithm == 1) {      
-        ChudnovskyAlgorithm(numThreads, precision); 
-    } else {
+    switch (algorithm)
+    {
+    case 0:
+        printf("Algoritmo: BBP (Primera version) \n");
+        BBPAlgorithmV1(num_threads, precision); 
+        break;
+    case 1:
+        printf("Algoritmo: BBP \n");
+        BBPAlgorithm(num_threads, precision); 
+        break;
+    case 2:
+        printf("Algoritmo: Chudnovsky \n");
+        ChudnovskyAlgorithm(num_threads, precision); 
+        break;
+    default:
         incorrectParams();
         exit(-1);
+        break;
     }
+
     
     gettimeofday(&t2, NULL);
-    executionTime = ((t2.tv_sec - t1.tv_sec) * 1000000u +  t2.tv_usec - t1.tv_usec)/1.e6; 
+    execution_time = ((t2.tv_sec - t1.tv_sec) * 1000000u +  t2.tv_usec - t1.tv_usec)/1.e6; 
     
     //Print the results
-    if(algorithm == 0) printf("Algoritmo: BBP \n");
-    else printf("Algoritmo: Chudnovsky \n");
     printf("Precision: %d \n", precision);
-    printf("Numero de hebras: %d\n", numThreads);
-    printf("Tiempo de ejecucion: %f segundos. \n", executionTime);
+    printf("Numero de hebras: %d\n", num_threads);
+    printf("Tiempo de ejecucion: %f segundos. \n", execution_time);
 
     exit(0);
 }
