@@ -8,8 +8,8 @@
     Compiling the file: gcc -fopenmp PiCalculator.c BPPAlgorithm.c ... -o PiDecimals -lgmp       
     Executing: ./PiDecimals algorithm precision num_threads                                       
         Algorithm can be:                                                                           
-        0 -> BBP (Bailey-Borwein-Plouffe)
-        1 -> Chudnovsky
+        0-2 -> BBP (Bailey-Borwein-Plouffe)
+        3 -> Chudnovsky
  
  *************************************************************************************************/  
 
@@ -20,8 +20,9 @@ int incorrectParams(){
     printf(" ./PiDecimals algorithm precision num_threads \n");
     printf("    Algorithm can be: \n");
     printf("        0 -> BBP (Bailey-Borwein-Plouffe) Version 1 \n");
-    printf("        1 -> BBP (Bailey-Borwein-Plouffe) \n");
-    printf("        2 -> Chudnovsky \n"); 
+    printf("        1 -> BBP (Bailey-Borwein-Plouffe) Version 2 \n");
+    printf("        2 -> BBP (Bailey-Borwein-Plouffe) \n");
+    printf("        3 -> Chudnovsky \n"); 
 }
 
 void piDecimalsTitle(){
@@ -65,10 +66,14 @@ int main(int argc, char **argv){
         BBPAlgorithmV1(num_threads, precision); 
         break;
     case 1:
+        printf("Algoritmo: BBP (Segunda version) \n");
+        BBPAlgorithmV2(num_threads, precision); 
+        break;
+    case 2:
         printf("Algoritmo: BBP \n");
         BBPAlgorithm(num_threads, precision); 
         break;
-    case 2:
+    case 3:
         printf("Algoritmo: Chudnovsky \n");
         ChudnovskyAlgorithm(num_threads, precision); 
         break;
