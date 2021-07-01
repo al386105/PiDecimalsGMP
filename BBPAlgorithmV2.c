@@ -39,10 +39,7 @@ void BBPIterationV2(mpf_t pi, int n, mpf_t jump, mpf_t m){
     mpf_mul(m, m, jump);  
 }
 
-void SequentialBBPAlgorithmV2(mpf_t pi, int num_iterations){
-    double execution_time;
-    struct timeval t1, t2;
-     
+void SequentialBBPAlgorithmV2(mpf_t pi, int num_iterations){    
     double q = 1.0 / 16.0;
     mpf_t m, quotient;           
     mpf_init_set_ui(m, 1);          // m = (1/16)^n
@@ -50,11 +47,7 @@ void SequentialBBPAlgorithmV2(mpf_t pi, int num_iterations){
 
     int i;
     for(i = 0; i < num_iterations; i++){
-        gettimeofday(&t1, NULL);
         BBPIterationV2(pi, i, quotient, m);   
-        gettimeofday(&t2, NULL);
-        execution_time = ((t2.tv_sec - t1.tv_sec) * 1000000u +  t2.tv_usec - t1.tv_usec)/1.e6; 
-        printf("%f\n", execution_time); 
     }
 
 }

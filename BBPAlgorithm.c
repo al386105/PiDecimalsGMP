@@ -12,7 +12,7 @@
 *                     16^n    8n + 1    8n + 4   8n + 5   8n + 6                    *
 *************************************************************************************/
 
-void BBPIteration(mpf_t pi, int n, mpf_t jump, mpf_t m, mpf_t a, mpf_t b, mpf_t c, mpf_t d, mpf_t aux ){
+void BBPIteration(mpf_t pi, int n, mpf_t m, mpf_t a, mpf_t b, mpf_t c, mpf_t d, mpf_t aux ){
     mpf_set_ui(a, 4.0);         // a = (  4 / (8n + 1))
     mpf_set_ui(b, 2.0);         // b = ( -2 / (8n + 4))
     mpf_set_ui(c, 1.0);         // c = ( -1 / (8n + 5))
@@ -34,15 +34,9 @@ void BBPIteration(mpf_t pi, int n, mpf_t jump, mpf_t m, mpf_t a, mpf_t b, mpf_t 
     mpf_mul(aux, aux, m);   
     
     mpf_add(pi, pi, aux);    
-
-    // Update m for next iteration: m^n = m^num_threads * m^(n-num_threads) 
-    mpf_mul(m, m, jump);  
 }
 
-void SequentialBBPAlgorithm(mpf_t pi, int num_iterations){
-    double execution_time;
-    struct timeval t1, t2;
-    
+void SequentialBBPAlgorithm(mpf_t pi, int num_iterations){   
     int i;
     mpf_t m, quotient, a, b, c, d, aux;           
     mpf_init_set_ui(m, 1);              // m = (1/16)^n
@@ -50,11 +44,9 @@ void SequentialBBPAlgorithm(mpf_t pi, int num_iterations){
     mpf_inits(a, b, c, d, aux, NULL);
 
     for(i = 0; i < num_iterations; i++){
-        gettimeofday(&t1, NULL);
-        BBPIteration(pi, i, quotient, m, a, b, c, d, aux);   
-        gettimeofday(&t2, NULL);
-        execution_time = ((t2.tv_sec - t1.tv_sec) * 1000000u +  t2.tv_usec - t1.tv_usec)/1.e6; 
-        printf("%f\n", execution_time); 
+        BBPIteration(pi, i, m, a, b, c, d, aux);   
+        // Update m for next iteration: m^n = m^num_threads * m^(n-num_threads) 
+        mpf_mul(m, m, quotient); 
     }
 
 }
@@ -82,7 +74,9 @@ void ParallelBBPAlgorithm(mpf_t pi, int num_iterations, int num_threads){
         //First Phase -> Working on a local variable        
         #pragma omp parallel for 
             for(i = thread_id; i < num_iterations; i+=num_threads){
-                BBPIteration(local_pi, i, jump, m, a, b, c, d, aux);    
+                BBPIteration(local_pi, i, m, a, b, c, d, aux);
+                // Update m for next iteration: m^n = m^num_threads * m^(n-num_threads) 
+                mpf_mul(m, m, jump);    
             }
 
         //Second Phase -> Accumulate the result in the global variable

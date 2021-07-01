@@ -9,8 +9,6 @@
 #define D 426880
 #define E 10005
 
-
-
 /*Chudnovsky formula
 *************************************************************************************
 *     426880 sqrt(10005)                 (6n)! (545140134n + 13591409)              * 
@@ -54,9 +52,6 @@ void ChudnovskyIteration(mpf_t pi, int n, mpf_t dep_a, mpf_t dep_b, mpf_t dep_c,
 }
 
 void SequentialChudnovskyAlgorithm(mpf_t pi, int num_iterations){
-    double execution_time;
-    struct timeval t1, t2; 
-    
     int num_factorials, i; 
     num_factorials = num_iterations * 6;
     mpf_t factorials[num_factorials + 1];
@@ -74,17 +69,12 @@ void SequentialChudnovskyAlgorithm(mpf_t pi, int num_iterations){
     mpf_pow_ui(c, c, 3);
 
     for(i = 0; i < num_iterations; i ++){
-        gettimeofday(&t1, NULL);
         ChudnovskyIteration(pi, i, dep_a, dep_b, dep_c, dep_d, dividend, divisor);
         //Update dependencies
         mpf_set(dep_a, factorials[6 * (i + 1)]);
         mpf_pow_ui(dep_b, factorials[i + 1], 3);
         mpf_set(dep_c, factorials[3 * (i + 1)]);
         mpf_mul(dep_d, dep_d, c);
-
-        gettimeofday(&t2, NULL);
-        execution_time = ((t2.tv_sec - t1.tv_sec) * 1000000u +  t2.tv_usec - t1.tv_usec)/1.e6; 
-        //printf("%f\n", execution_time);
     }
     mpf_sqrt(aux, aux);
     mpf_mul_ui(aux, aux, D);
