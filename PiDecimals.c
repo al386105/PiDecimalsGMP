@@ -16,12 +16,12 @@
 double gettimeofday();
 
 int incorrectParams(){
-    printf("Parametros introducidos incorrectos. Se debe ejcutar como: \n");
+    printf("Introduced params are not correct. Try as: \n");
     printf(" ./PiDecimals algorithm precision num_threads \n");
     printf("    Algorithm can be: \n");
-    printf("        0 -> BBP (Bailey-Borwein-Plouffe) Version 1 \n");
-    printf("        1 -> BBP (Bailey-Borwein-Plouffe) Version 2 \n");
-    printf("        2 -> BBP (Bailey-Borwein-Plouffe) \n");
+    printf("        0 -> BBP (Bailey-Borwein-Plouffe) First version  \n");
+    printf("        1 -> BBP (Bailey-Borwein-Plouffe) Second version \n");
+    printf("        2 -> BBP (Bailey-Borwein-Plouffe) Last version   \n");
     printf("        3 -> Chudnovsky \n"); 
 }
 
@@ -62,19 +62,19 @@ int main(int argc, char **argv){
     switch (algorithm)
     {
     case 0:
-        printf("Algoritmo: BBP (Primera version) \n");
+        printf("Algorithm: BBP (First version) \n");
         BBPAlgorithmV1(num_threads, precision); 
         break;
     case 1:
-        printf("Algoritmo: BBP (Segunda version) \n");
+        printf("Algorithm: BBP (Second version) \n");
         BBPAlgorithmV2(num_threads, precision); 
         break;
     case 2:
-        printf("Algoritmo: BBP \n");
+        printf("Algorithm: BBP (Last version)\n");
         BBPAlgorithm(num_threads, precision); 
         break;
     case 3:
-        printf("Algoritmo: Chudnovsky \n");
+        printf("Algorithm: Chudnovsky \n");
         ChudnovskyAlgorithm(num_threads, precision); 
         break;
     default:
@@ -88,9 +88,9 @@ int main(int argc, char **argv){
     execution_time = ((t2.tv_sec - t1.tv_sec) * 1000000u +  t2.tv_usec - t1.tv_usec)/1.e6; 
     
     //Print the results
-    printf("Precision: %d \n", precision);
-    printf("Numero de hebras: %d\n", num_threads);
-    printf("Tiempo de ejecucion: %f segundos. \n", execution_time);
+    printf("Precision used: %d \n", precision);
+    printf("Number of threads: %d\n", num_threads);
+    printf("Execution time: %f seconds. \n", execution_time);
 
     exit(0);
 }

@@ -30,7 +30,7 @@ void checkDecimals(mpf_t pi){
         i++;
     }
     i = (i < 2) ? 0: i - 2;
-    printf("Coinciden los %d primeros decimales \n", i);
+    printf("Match the first %d decimal places \n", i);
     
     fclose(file);
 }

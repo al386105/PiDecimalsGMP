@@ -82,7 +82,7 @@ void SequentialChudnovskyAlgorithm(mpf_t pi, int num_iterations){
     
     //Clear memory
     clearFactorials(factorials, num_factorials);
-    mpf_clear(dep_a); mpf_clear(dep_b); mpf_clear(dep_c); mpf_clear(dep_d); mpf_clear(c); mpf_clear(aux);
+    mpf_clears(dep_a, dep_b, dep_c, dep_d, c, aux, dividend, divisor, NULL);
 
 }
 
@@ -139,7 +139,7 @@ void ParallelChudnovskyAlgorithm(mpf_t pi, int num_iterations, int num_threads){
         mpf_add(pi, pi, local_pi);
         
         //Clear memory
-        mpf_clear(local_pi); mpf_clear(dep_a); mpf_clear(dep_b); mpf_clear(dep_c); mpf_clear(dep_d);  
+        mpf_clears(local_pi, dep_a, dep_b, dep_c, dep_d, dividend, divisor, NULL);   
     }
 
     mpf_sqrt(aux, aux);
@@ -148,6 +148,6 @@ void ParallelChudnovskyAlgorithm(mpf_t pi, int num_iterations, int num_threads){
     
     //Clear memory
     clearFactorials(factorials, num_factorials);
-    mpf_clear(c); mpf_clear(aux);
+    mpf_clears(c, aux, NULL);
 }
 

@@ -48,7 +48,7 @@ void SequentialBBPAlgorithm(mpf_t pi, int num_iterations){
         // Update m for next iteration: m^n = m^num_threads * m^(n-num_threads) 
         mpf_mul(m, m, quotient); 
     }
-
+    mpf_clears(m, quotient, a, b, c, d, aux, NULL);
 }
 
 void ParallelBBPAlgorithm(mpf_t pi, int num_iterations, int num_threads){
@@ -84,12 +84,10 @@ void ParallelBBPAlgorithm(mpf_t pi, int num_iterations, int num_threads){
         mpf_add(pi, pi, local_pi);
 
         //Clear memory
-        mpf_clear(local_pi);   
-        mpf_clear(m);     
+        mpf_clears(local_pi, m, a, b, c, d, aux, NULL);   
     }
         
     //Clear memory
-    mpf_clear(quotient);
-    mpf_clear(jump);
+    mpf_clears(jump, quotient, NULL);
 }
 
