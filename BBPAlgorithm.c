@@ -12,6 +12,9 @@
 *                     16^n    8n + 1    8n + 4   8n + 5   8n + 6                    *
 *************************************************************************************/
 
+/*
+ * An iteration of Bailey Borwein Plouffe formula
+ */
 void BBPIteration(mpf_t pi, int n, mpf_t m, mpf_t a, mpf_t b, mpf_t c, mpf_t d, mpf_t aux ){
     mpf_set_ui(a, 4.0);         // a = (  4 / (8n + 1))
     mpf_set_ui(b, 2.0);         // b = ( -2 / (8n + 4))
@@ -36,6 +39,9 @@ void BBPIteration(mpf_t pi, int n, mpf_t m, mpf_t a, mpf_t b, mpf_t c, mpf_t d, 
     mpf_add(pi, pi, aux);    
 }
 
+/*
+ * Sequential Pi number calculation using the BBP algorithm
+ */
 void SequentialBBPAlgorithm(mpf_t pi, int num_iterations){   
     int i;
     mpf_t m, quotient, a, b, c, d, aux;           
@@ -43,14 +49,19 @@ void SequentialBBPAlgorithm(mpf_t pi, int num_iterations){
     mpf_init_set_d(quotient, QUOTIENT); // quotient = (1/16)   
     mpf_inits(a, b, c, d, aux, NULL);
 
-    for(i = 0; i < num_iterations; i++){
+    for(i = 0; i < num_iterations; i++){ 
         BBPIteration(pi, i, m, a, b, c, d, aux);   
         // Update m for next iteration: m^n = m^num_threads * m^(n-num_threads) 
-        mpf_mul(m, m, quotient); 
+        mpf_mul(m, m, quotient);
     }
     mpf_clears(m, quotient, a, b, c, d, aux, NULL);
 }
 
+/*
+ * Parallel Pi number calculation using the BBP algorithm
+ * The number of iterations is divided cyclically, 
+ * so each thread calculates a part of Pi.  
+ */
 void ParallelBBPAlgorithm(mpf_t pi, int num_iterations, int num_threads){
     mpf_t jump, quotient; 
     mpf_init_set_d(quotient, QUOTIENT);         // quotient = (1 / 16)   
@@ -67,7 +78,7 @@ void ParallelBBPAlgorithm(mpf_t pi, int num_iterations, int num_threads){
 
         thread_id = omp_get_thread_num();
         mpf_init_set_ui(local_pi, 0);       // private thread pi
-        mpf_init_set_ui(m, 0);
+        mpf_init(m);
         mpf_pow_ui(m, quotient, thread_id); // m = (1/16)^n                  
         mpf_inits(a, b, c, d, aux, NULL);
 

@@ -4,6 +4,7 @@
 #include "BBPAlgorithmV1.h"
 #include "BBPAlgorithmV2.h"
 #include "BBPAlgorithm.h"
+#include "BellardAlgorithm.h"
 #include "ChudnovskyAlgorithm.h"
 
 
@@ -89,6 +90,25 @@ void BBPAlgorithm(int num_threads, int precision){
     mpf_clear(pi);
 }
 
+void BellardAlgorithm(int num_threads, int precision){
+    //Set gmp float precision (in bits) and init pi
+    mpf_set_default_prec(precision * 8); 
+    mpf_t pi;
+    mpf_init_set_ui(pi, 0);
+    int num_iterations = precision / 3;
+    //int num_iterations = (precision + 4 - 1) / 4;  //Division por exceso
+
+    if(num_threads <= 1){ 
+        SequentialBellardAlgorithm(pi, num_iterations);
+    } else {
+        ParallelBellardAlgorithm(pi, num_iterations, num_threads);
+    }
+    
+    checkDecimals(pi);
+
+    mpf_clear(pi);
+}   
+
 void ChudnovskyAlgorithm(int num_threads, int precision){
     //Set gmp float precision (in bits) and init pi
     mpf_set_default_prec(precision * 8); 
@@ -106,4 +126,6 @@ void ChudnovskyAlgorithm(int num_threads, int precision){
 
     mpf_clear(pi);
 }   
+
+
 

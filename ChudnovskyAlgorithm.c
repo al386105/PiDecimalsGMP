@@ -16,6 +16,12 @@
 *            pi                            (n!)^3 (3n)! (-640320)^3n                *
 *************************************************************************************/
 
+/*
+ * This method calculates the factorials from 0 to num_factorials (included) 
+ * and stores them in their corresponding vector position (factorials[n] = n!): 
+ * factorials[0] = 1, factorials[1] = 1, factorials[2] = 2, factorials[3] = 6, etc.
+ * The computation is performed with a single thread. 
+ */
 void getFactorials(mpf_t * factorials, int num_factorials){
     int i;
     mpf_t f;
@@ -28,6 +34,9 @@ void getFactorials(mpf_t * factorials, int num_factorials){
     mpf_clear(f);
 }
 
+/*
+ * This method clears the factorials computed 
+ */
 void clearFactorials(mpf_t * factorials, int num_factorials){
     int i;
     for(i = 0; i <= num_factorials; i++){
@@ -35,6 +44,9 @@ void clearFactorials(mpf_t * factorials, int num_factorials){
     }
 }
 
+/*
+ * An iteration of Chudnovsky formula
+ */
 void ChudnovskyIteration(mpf_t pi, int n, mpf_t dep_a, mpf_t dep_b, mpf_t dep_c, mpf_t dep_d, 
                                 mpf_t dividend, mpf_t divisor){
     mpf_set_ui(dividend, n);
@@ -45,12 +57,15 @@ void ChudnovskyIteration(mpf_t pi, int n, mpf_t dep_a, mpf_t dep_b, mpf_t dep_c,
     mpf_set_ui(divisor, 0);
     mpf_mul(divisor, dep_b, dep_c);
     mpf_mul(divisor, divisor, dep_d);
-
+    
     mpf_div(dividend, dividend, divisor);
 
     mpf_add(pi, pi, dividend);
 }
 
+/*
+ * Sequential Pi number calculation using the Chudnovsky algorithm
+ */
 void SequentialChudnovskyAlgorithm(mpf_t pi, int num_iterations){
     int num_factorials, i; 
     num_factorials = num_iterations * 6;
@@ -86,6 +101,11 @@ void SequentialChudnovskyAlgorithm(mpf_t pi, int num_iterations){
 
 }
 
+/*
+ * Parallel Pi number calculation using the Chudnovsky algorithm
+ * The number of iterations is divided by blocks 
+ * so each thread calculates a part of pi.  
+ */
 void ParallelChudnovskyAlgorithm(mpf_t pi, int num_iterations, int num_threads){
     mpf_t aux, c;
     int num_factorials, block_size;
