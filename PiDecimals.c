@@ -9,8 +9,8 @@
     Executing: ./PiDecimals algorithm precision num_threads                                       
         Algorithm can be:                                                                           
         0-2 -> BBP (Bailey-Borwein-Plouffe)
-        3 -> Bellard
-        4 -> Chudnovsky
+        3   -> Bellard
+        4-5 -> Chudnovsky
  
  *************************************************************************************************/  
 
@@ -24,7 +24,8 @@ int incorrectParams(){
     printf("        1 -> BBP (Bailey-Borwein-Plouffe) Second version \n");
     printf("        2 -> BBP (Bailey-Borwein-Plouffe) Last version   \n");
     printf("        3 -> Bellard \n"); 
-    printf("        4 -> Chudnovsky \n"); 
+    printf("        4 -> Chudnovsky (Without factorials) \n");
+    printf("        5 -> Chudnovsky \n"); 
 }
 
 void piDecimalsTitle(){
@@ -80,6 +81,10 @@ int main(int argc, char **argv){
         BellardAlgorithm(num_threads, precision); 
         break;
     case 4:
+        printf("Algorithm: Chudnovsky (Without factorials) \n");
+        ChudnovskyAlgorithmV1(num_threads, precision); 
+        break;
+    case 5:
         printf("Algorithm: Chudnovsky \n");
         ChudnovskyAlgorithm(num_threads, precision); 
         break;

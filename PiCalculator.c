@@ -5,7 +5,9 @@
 #include "BBPAlgorithmV2.h"
 #include "BBPAlgorithm.h"
 #include "BellardAlgorithm.h"
+#include "ChudnovskyAlgorithmV1.h"
 #include "ChudnovskyAlgorithm.h"
+
 
 
 void checkDecimals(mpf_t pi){
@@ -120,6 +122,24 @@ void ChudnovskyAlgorithm(int num_threads, int precision){
         SequentialChudnovskyAlgorithm(pi, num_iterations);
     } else {
         ParallelChudnovskyAlgorithm(pi, num_iterations, num_threads);
+    }
+    
+    checkDecimals(pi);
+
+    mpf_clear(pi);
+}   
+
+void ChudnovskyAlgorithmV1(int num_threads, int precision){
+    //Set gmp float precision (in bits) and init pi
+    mpf_set_default_prec(precision * 8); 
+    mpf_t pi;
+    mpf_init_set_ui(pi, 0);
+    int num_iterations = (precision + 14 - 1) / 14;  //Division por exceso
+
+    if(num_threads <= 1){ 
+        SequentialChudnovskyAlgorithmV1(pi, num_iterations);
+    } else {
+        printf("This version is not parallelizable. Try with one thread \n");
     }
     
     checkDecimals(pi);

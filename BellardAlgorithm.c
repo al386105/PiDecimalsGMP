@@ -3,12 +3,25 @@
 #include <gmp.h>
 #include <omp.h>
 
-/*Bellard formula
-*************************************************************************************
-*                 (-1)^n     32     1      256     64       4       4       1       *
-* 2^6 * pi = SUM( ------ [- ---- - ---- + ----- - ----- - ----- - ----- + -----])   *
-*                 2^10n     4n+1   4n+3   10n+1   10n+3   10n+5   10n+7   10n+9     *
-*************************************************************************************/
+
+/************************************************************************************
+ * Bellard formula implementation                                                   *
+ *                                                                                  *
+ *                                                                                  *
+ ************************************************************************************
+ * Bellard formula:                                                                 *
+ *                 (-1)^n     32     1      256     64       4       4       1      *
+ * 2^6 * pi = SUM( ------ [- ---- - ---- + ----- - ----- - ----- - ----- + -----])  *
+ *                 2^10n     4n+1   4n+3   10n+1   10n+3   10n+5   10n+7   10n+9    *
+ *                                                                                  *
+ ************************************************************************************
+ * Bellard formula dependencies:                                                    *
+ *                           1            1                                         *
+ *                  m(n) = ------ = -----------------                               *
+ *                         1024^n   1024^(n-1) * 1024                               *
+ *                                                                                  *                                          *
+ ************************************************************************************/
+
 
 /*
  * An iteration of Bellard formula
@@ -25,44 +38,29 @@ void BellardIteration(mpf_t pi, int n, mpf_t m, mpf_t a, mpf_t b, mpf_t c, mpf_t
     mpf_set_ui(aux, 0);         // aux = (- a - b + c - d - e - f + g)  
 
     int i = n * 4;              // i = n * 4 
-    mpf_div_ui(a, a, i + 1);    // a = ( 32 / ( 4n + 1)), i + 1 => i | 1
-    mpf_div_ui(b, b, i + 3);    // b = (  1 / ( 4n + 3)), i + 3 => i | 3
+    mpf_div_ui(a, a, i + 1);    // a = ( 32 / ( 4n + 1))
+    mpf_div_ui(b, b, i + 3);    // b = (  1 / ( 4n + 3))
 
     i = n * 10;                 // i = n * 10
-    mpf_div_ui(c, c, i + 1);    // c = (256 / (10n + 1)), i + 1 => i | 1
-    mpf_div_ui(d, d, i + 3);    // d = ( 64 / (10n + 3)), i + 3 => i | 3
-    mpf_div_ui(e, e, i + 5);    // e = (  4 / (10n + 5)), i + 5 => i | 5
-    mpf_div_ui(f, f, i + 7);    // f = (  4 / (10n + 7)), i + 7 => i | 7
-    mpf_div_ui(g, g, i + 9);    // g = (  1 / (10n + 9)), i + 9 => i | 9
-
+    mpf_div_ui(c, c, i + 1);    // c = (256 / (10n + 1))
+    mpf_div_ui(d, d, i + 3);    // d = ( 64 / (10n + 3))
+    mpf_div_ui(e, e, i + 5);    // e = (  4 / (10n + 5))
+    mpf_div_ui(f, f, i + 7);    // f = (  4 / (10n + 7))
+    mpf_div_ui(g, g, i + 9);    // g = (  1 / (10n + 9))
 
     // aux = (- a - b + c - d - e - f + g)   
-    // mpf_neg(a, a);
-    // mpf_sub(a, a, b);
-    // mpf_sub(c, c, d);
-    // mpf_add(a, a, c);
-    // mpf_neg(e, e);
-    // mpf_sub(e, e, f);
-    // mpf_add(e, e, g);
-    // mpf_add(aux, a, e);
-
     mpf_neg(a, a);
-    mpf_neg(b, b);
-    mpf_neg(d, d);
-    mpf_neg(e, e);
-    mpf_neg(f, f);
-
-    mpf_add(aux, a , b);
-    mpf_add(aux, aux , c);
-    mpf_add(aux, aux , d);
-    mpf_add(aux, aux , e);
-    mpf_add(aux, aux , f);
-    mpf_add(aux, aux , g);
+    mpf_sub(aux, a, b);
+    mpf_sub(c, c, d);
+    mpf_sub(c, c, e);
+    mpf_sub(c, c, f);
+    mpf_add(c, c, g);
+    mpf_add(aux, aux, c);
 
     // aux = m * aux
     mpf_mul(aux, aux, m);   
 
-    mpf_add(pi, pi, aux);    
+    mpf_add(pi, pi, aux); 
 }
 
 /*

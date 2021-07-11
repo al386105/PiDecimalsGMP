@@ -3,14 +3,29 @@
 #include <gmp.h>
 #include <omp.h>
 
-/*  Segunda version del algoritmo BBP:
-    No controla el crecimiento de memoria. 
-*************************************************************************************
-*                      1        4          2        1       1                       * 
-*    pi = SUMMATORY( ------ [ ------  - ------ - ------ - ------]),  n >=0          *
-*                     16^n    8n + 1    8n + 4   8n + 5   8n + 6                    *
-*************************************************************************************/
 
+/************************************************************************************
+ * Second version of Bailey Borwein Plouffe formula implementation                  *
+ * Does not free the memory                                                         *
+ *                                                                                  *
+ ************************************************************************************
+ * Bailey Borwein Plouffe formula:                                                  *
+ *                      1        4          2        1       1                      * 
+ *    pi = SUMMATORY( ------ [ ------  - ------ - ------ - ------]),  n >=0         *
+ *                     16^n    8n + 1    8n + 4   8n + 5   8n + 6                   *
+ *                                                                                  *
+ ************************************************************************************
+ * Bailey Borwein Plouffe formula dependencies:                                     *
+ *                           1          1                                           *
+ *                  m(n) = ----- = ------------                                     *
+ *                          16^n   16^(n-1) * 16                                    *
+ *                                                                                  *
+ ************************************************************************************/
+
+
+/*
+ * An iteration of Bailey Borwein Plouffe formula
+ */
 void BBPIterationV2(mpf_t pi, int n, mpf_t jump, mpf_t m){
     mpf_t a, b, c, d, aux;
     mpf_init_set_ui(a, 4.0);        // (  4 / 8n + 1))
@@ -39,6 +54,9 @@ void BBPIterationV2(mpf_t pi, int n, mpf_t jump, mpf_t m){
     mpf_mul(m, m, jump);  
 }
 
+/*
+ * Sequential Pi number calculation using the BBP algorithm
+ */
 void SequentialBBPAlgorithmV2(mpf_t pi, int num_iterations){    
     double q = 1.0 / 16.0;
     mpf_t m, quotient;           
@@ -52,6 +70,11 @@ void SequentialBBPAlgorithmV2(mpf_t pi, int num_iterations){
 
 }
 
+/*
+ * Parallel Pi number calculation using the BBP algorithm
+ * The number of iterations is divided cyclically, 
+ * so each thread calculates a part of Pi.  
+ */
 void ParallelBBPAlgorithmV2(mpf_t pi, int num_iterations, int num_threads){
     int thread_id, i;
     double q = 1.0 / 16.0;
