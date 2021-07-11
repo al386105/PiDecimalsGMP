@@ -55,6 +55,7 @@ void BBPIterationV1(mpf_t pi, int n, mpf_t quotient){
 
 /*
  * Sequential Pi number calculation using the BBP algorithm
+ * Single thread implementation
  */
 void SequentialBBPAlgorithmV1(mpf_t pi, int num_iterations){
     double q = 1.0 / 16.0;

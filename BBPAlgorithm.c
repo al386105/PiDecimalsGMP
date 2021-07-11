@@ -54,6 +54,7 @@ void BBPIteration(mpf_t pi, int n, mpf_t m, mpf_t a, mpf_t b, mpf_t c, mpf_t d, 
 
 /*
  * Sequential Pi number calculation using the BBP algorithm
+ * Single thread implementation
  */
 void SequentialBBPAlgorithm(mpf_t pi, int num_iterations){   
     int i;
@@ -64,7 +65,7 @@ void SequentialBBPAlgorithm(mpf_t pi, int num_iterations){
 
     for(i = 0; i < num_iterations; i++){ 
         BBPIteration(pi, i, m, a, b, c, d, aux);   
-        // Update m for next iteration: m^n = m^num_threads * m^(n-num_threads) 
+        // Update m for next iteration:  
         mpf_mul(m, m, quotient);
     }
     mpf_clears(m, quotient, a, b, c, d, aux, NULL);
@@ -72,6 +73,7 @@ void SequentialBBPAlgorithm(mpf_t pi, int num_iterations){
 
 /*
  * Parallel Pi number calculation using the BBP algorithm
+ * Multiple threads can be used
  * The number of iterations is divided cyclically, 
  * so each thread calculates a part of Pi.  
  */
@@ -99,7 +101,7 @@ void ParallelBBPAlgorithm(mpf_t pi, int num_iterations, int num_threads){
         #pragma omp parallel for 
             for(i = thread_id; i < num_iterations; i+=num_threads){
                 BBPIteration(local_pi, i, m, a, b, c, d, aux);
-                // Update m for next iteration: m^n = m^num_threads * m^(n-num_threads) 
+                // Update m for next iteration:  
                 mpf_mul(m, m, jump);    
             }
 

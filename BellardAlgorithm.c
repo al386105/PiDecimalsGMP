@@ -65,6 +65,7 @@ void BellardIteration(mpf_t pi, int n, mpf_t m, mpf_t a, mpf_t b, mpf_t c, mpf_t
 
 /*
  * Sequential Pi number calculation using the Bellard algorithm
+ * Single thread implementation
  */
 void SequentialBellardAlgorithm(mpf_t pi, int num_iterations){   
     int i;
@@ -87,6 +88,7 @@ void SequentialBellardAlgorithm(mpf_t pi, int num_iterations){
 
 /*
  * Parallel Pi number calculation using the Bellard algorithm
+ * Multiple threads can be used
  * The number of iterations is divided cyclically, 
  * so each thread calculates a part of Pi.  
  */

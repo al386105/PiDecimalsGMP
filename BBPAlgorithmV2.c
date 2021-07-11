@@ -56,6 +56,7 @@ void BBPIterationV2(mpf_t pi, int n, mpf_t jump, mpf_t m){
 
 /*
  * Sequential Pi number calculation using the BBP algorithm
+ * Single thread implementation
  */
 void SequentialBBPAlgorithmV2(mpf_t pi, int num_iterations){    
     double q = 1.0 / 16.0;
@@ -72,6 +73,7 @@ void SequentialBBPAlgorithmV2(mpf_t pi, int num_iterations){
 
 /*
  * Parallel Pi number calculation using the BBP algorithm
+ * Multiple threads can be used
  * The number of iterations is divided cyclically, 
  * so each thread calculates a part of Pi.  
  */

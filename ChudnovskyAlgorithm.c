@@ -11,7 +11,7 @@
 
 /************************************************************************************
  * Chudnovsky formula implementation                                                *
- *                                                                                  *
+ * This version computes all the factorials needed before performing the iterations *
  *                                                                                  *
  ************************************************************************************
  * Chudnovsky formula:                                                              *
@@ -77,6 +77,7 @@ void ChudnovskyIteration(mpf_t pi, int n, mpf_t dep_a, mpf_t dep_b, mpf_t dep_c,
 
 /*
  * Sequential Pi number calculation using the Chudnovsky algorithm
+ * Single thread implementation
  */
 void SequentialChudnovskyAlgorithm(mpf_t pi, int num_iterations){
     int num_factorials, i; 
@@ -115,6 +116,7 @@ void SequentialChudnovskyAlgorithm(mpf_t pi, int num_iterations){
 
 /*
  * Parallel Pi number calculation using the Chudnovsky algorithm
+ * Multiple threads can be used
  * The number of iterations is divided by blocks 
  * so each thread calculates a part of pi.  
  */

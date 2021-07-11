@@ -12,8 +12,8 @@
 
 /************************************************************************************
  * Chudnovsky formula implementation                                                *
- * This version only implements the single thread version                           *
- *                                                                                  *
+ * This version does not computes the factorials                                    *
+ * Only implements the single thread version                                        *
  ************************************************************************************
  * Chudnovsky formula:                                                              *
  *     426880 sqrt(10005)                 (6n)! (545140134n + 13591409)             * 
@@ -49,6 +49,7 @@ void ChudnovskyIterationV1(mpf_t pi, int n, mpf_t dep_a, mpf_t dep_b,
 
 /*
  * Sequential Pi number calculation using the Chudnovsky algorithm
+ * Single thread implementation
  */
 void SequentialChudnovskyAlgorithmV1(mpf_t pi, int num_iterations){
     int i, factor_a;
