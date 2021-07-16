@@ -8,9 +8,9 @@
     Compiling the file: gcc -fopenmp PiCalculator.c BPPAlgorithm.c ... -o PiDecimals -lgmp       
     Executing: ./PiDecimals algorithm precision num_threads                                       
         Algorithm can be:                                                                           
-        0-2 -> BBP (Bailey-Borwein-Plouffe)
-        3   -> Bellard
-        4-5 -> Chudnovsky
+        0-1 -> BBP (Bailey-Borwein-Plouffe)
+        2   -> Bellard
+        3-4 -> Chudnovsky
  
  *************************************************************************************************/  
 
@@ -21,11 +21,10 @@ int incorrectParams(){
     printf(" ./PiDecimals algorithm precision num_threads \n");
     printf("    Algorithm can be: \n");
     printf("        0 -> BBP (Bailey-Borwein-Plouffe) First version  \n");
-    printf("        1 -> BBP (Bailey-Borwein-Plouffe) Second version \n");
-    printf("        2 -> BBP (Bailey-Borwein-Plouffe) Last version   \n");
-    printf("        3 -> Bellard \n"); 
+    printf("        1 -> BBP (Bailey-Borwein-Plouffe) Last version   \n");
+    printf("        2 -> Bellard \n"); 
+    printf("        3 -> Chudnovsky \n"); 
     printf("        4 -> Chudnovsky (Without factorials) \n");
-    printf("        5 -> Chudnovsky \n"); 
 }
 
 void piDecimalsTitle(){
@@ -69,23 +68,19 @@ int main(int argc, char **argv){
         BBPAlgorithmV1(num_threads, precision); 
         break;
     case 1:
-        printf("Algorithm: BBP (Second version) \n");
-        BBPAlgorithmV2(num_threads, precision); 
-        break;
-    case 2:
         printf("Algorithm: BBP (Last version)\n");
         BBPAlgorithm(num_threads, precision); 
         break;
-    case 3:
+    case 2:
         printf("Algorithm: Bellard \n");
         BellardAlgorithm(num_threads, precision); 
         break;
-    case 4:
-        printf("Algorithm: Chudnovsky (Without factorials) \n");
+    case 3:
+        printf("Algorithm: Chudnovsky  \n");
         ChudnovskyAlgorithmV1(num_threads, precision); 
         break;
-    case 5:
-        printf("Algorithm: Chudnovsky \n");
+    case 4:
+        printf("Algorithm: Chudnovsky (Without factorials) \n");
         ChudnovskyAlgorithm(num_threads, precision); 
         break;
     default:
