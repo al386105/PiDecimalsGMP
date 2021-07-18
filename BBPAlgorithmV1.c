@@ -6,8 +6,9 @@
 #define QUOTIENT 0.0625
 
 /************************************************************************************
+ * Miguel Pardo Navarro. 17/07/2021                                                 *
  * First version of Bailey Borwein Plouffe formula implementation                   *
- *                                                                                  *
+ * It implements a single-threaded method and another that can use multiple threads *
  *                                                                                  *
  ************************************************************************************
  * Bailey Borwein Plouffe formula:                                                  *
@@ -32,12 +33,13 @@
  */
 void BBPIterationV1(mpf_t pi, int n, mpf_t quotient){
     mpf_t quot_a, quot_b, quot_c, quot_d, quot_m, aux;
-    mpf_init_set_ui(quot_a, 4);         // (  4 / 8n + 1))
-    mpf_init_set_ui(quot_b, 2);         // ( -2 / 8n + 4))
-    mpf_init_set_ui(quot_c, 1);         // ( -1 / 8n + 5))
-    mpf_init_set_ui(quot_d, 1);         // ( -1 / 8n + 6))
-    mpf_init_set_ui(quot_m, 0);         // (1/16)^n  
-    mpf_init(aux);                      // a + b + c + d  
+
+    mpf_init_set_ui(quot_a, 4);         // quot_a = (  4 / 8n + 1))
+    mpf_init_set_ui(quot_b, 2);         // quot_b = ( -2 / 8n + 4))
+    mpf_init_set_ui(quot_c, 1);         // quot_c = ( -1 / 8n + 5))
+    mpf_init_set_ui(quot_d, 1);         // quot_d = ( -1 / 8n + 6))
+    mpf_init_set_ui(quot_m, 0);         // quot_m = (1/16)^n  
+    mpf_init(aux);                      // aux = a + b + c + d  
 
     int i = n * 8;                 
     mpf_div_ui(quot_a, quot_a, i + 1);  // 4 / (8n + 1)
@@ -64,10 +66,11 @@ void BBPIterationV1(mpf_t pi, int n, mpf_t quotient){
  * Single thread implementation
  */
 void SequentialBBPAlgorithmV1(mpf_t pi, int num_iterations){
+    int i;
     mpf_t quotient;           
+
     mpf_init_set_d(quotient, QUOTIENT); // quotient = (1/16)      
 
-    int i;
     for(i = 0; i < num_iterations; i++){
         BBPIterationV1(pi, i, quotient);    
     }
@@ -84,6 +87,7 @@ void SequentialBBPAlgorithmV1(mpf_t pi, int num_iterations){
 void ParallelBBPAlgorithmV1(mpf_t pi, int num_iterations, int num_threads){
     int thread_id, i;
     mpf_t quotient; 
+
     mpf_init_set_d(quotient, QUOTIENT); // quotient = (1 / 16)   
 
     //Set the number of threads 
@@ -91,8 +95,9 @@ void ParallelBBPAlgorithmV1(mpf_t pi, int num_iterations, int num_threads){
 
     #pragma omp parallel private(thread_id, i)
     {
-        thread_id = omp_get_thread_num();
         mpf_t local_pi;
+
+        thread_id = omp_get_thread_num();
         mpf_init_set_ui(local_pi, 0);   // private thread pi
         
         //First Phase -> Working on a local variable        
@@ -105,7 +110,7 @@ void ParallelBBPAlgorithmV1(mpf_t pi, int num_iterations, int num_threads){
         #pragma omp critical
         mpf_add(pi, pi, local_pi);
 
-        //Clear memory
+        //Clear thread memory
         mpf_clear(local_pi);   
     }
         

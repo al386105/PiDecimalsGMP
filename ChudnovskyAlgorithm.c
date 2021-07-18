@@ -11,14 +11,21 @@
 
 
 /************************************************************************************
+ * Miguel Pardo Navarro. 17/07/2021                                                 *
  * Chudnovsky formula implementation                                                *
  * This version does not computes all the factorials                                *
+ * It implements a single-threaded method and another that can use multiple threads *
  *                                                                                  *
  ************************************************************************************
  * Chudnovsky formula:                                                              *
  *     426880 sqrt(10005)                 (6n)! (545140134n + 13591409)             * 
  *    --------------------  = SUMMATORY( ----------------------------- ),  n >=0    *
  *            pi                            (n!)^3 (3n)! (-640320)^3n               *
+ *                                                                                  *
+ * Some operands of the formula are coded as:                                       *                                             *
+ *      dep_a_dividend = (6n)!                                                      *
+ *      dep_a_divisor  = (n!)^3 (3n)!                                               *
+ *      e              = 426880 sqrt(10005)                                         *
  *                                                                                  *
  ************************************************************************************
  * Chudnovsky formula dependencies:                                                 *
@@ -28,6 +35,8 @@
  *                                                                                  *
  *      dep_b(n) = (-640320)^3n = (-640320)^3(n-1) * (-640320)^3)                   *
  *                                                                                  *
+ *      dep_c(n) = (545140134n + 13591409) = dep_c(n - 1) + 545140134               *
+ *                                                                                  *
  ************************************************************************************/
 
 
@@ -35,16 +44,11 @@
  * An iteration of Chudnovsky formula
  */
 void ChudnovskyIteration(mpf_t pi, int n, mpf_t dep_a, mpf_t dep_b, 
-                            mpf_t dividend, mpf_t divisor){
-    mpf_set_ui(dividend, n);
-    mpf_mul_ui(dividend, dividend, B);
-    mpf_add_ui(dividend, dividend, A);
-    mpf_mul(dividend, dividend, dep_a);
-
-    mpf_set(divisor, dep_b);
+                            mpf_t dep_c, mpf_t aux){
+    mpf_mul(aux, dep_a, dep_c);
+    mpf_div(aux, aux, dep_b);
     
-    mpf_div(dividend, dividend, divisor);
-    mpf_add(pi, pi, dividend);
+    mpf_add(pi, pi, aux);
 }
 
 /*
@@ -53,19 +57,20 @@ void ChudnovskyIteration(mpf_t pi, int n, mpf_t dep_a, mpf_t dep_b,
  */
 void SequentialChudnovskyAlgorithm(mpf_t pi, int num_iterations){
     int i, factor_a;
-    mpf_t dep_a, dep_a_dividend, dep_a_divisor, dep_b, aux, c, dividend, divisor;
+    mpf_t dep_a, dep_a_dividend, dep_a_divisor, dep_b, dep_c, e, c, aux;
 
-    mpf_inits(dep_a_dividend, dep_a_divisor, dividend, divisor, NULL);
+    mpf_inits(dep_a_dividend, dep_a_divisor, aux, NULL);
     mpf_init_set_ui(dep_a, 1);
     mpf_init_set_ui(dep_b, 1);
-    mpf_init_set_ui(aux, E);
+    mpf_init_set_ui(dep_c, A);
+    mpf_init_set_ui(e, E);
     mpf_init_set_ui(c, C);
     mpf_neg(c, c);
     mpf_pow_ui(c, c, 3);
 
     for(i = 0; i < num_iterations; i ++){
-        ChudnovskyIteration(pi, i, dep_a, dep_b, dividend, divisor);
-        //Update dependencies
+        ChudnovskyIteration(pi, i, dep_a, dep_b, dep_c, aux);
+        //Update dep_a:
         factor_a = 12 * i;
         mpf_set_ui(dep_a_dividend, factor_a + 10);
         mpf_mul_ui(dep_a_dividend, dep_a_dividend, factor_a + 6);
@@ -75,16 +80,20 @@ void SequentialChudnovskyAlgorithm(mpf_t pi, int num_iterations){
         mpf_set_ui(dep_a_divisor, i + 1);
         mpf_pow_ui(dep_a_divisor, dep_a_divisor ,3);
         mpf_div(dep_a, dep_a_dividend, dep_a_divisor);
- 
+
+        //Update dep_b:
         mpf_mul(dep_b, dep_b, c);
+
+        //Update dep_c:
+        mpf_add_ui(dep_c, dep_c, B);
     }
 
-    mpf_sqrt(aux, aux);
-    mpf_mul_ui(aux, aux, D);
-    mpf_div(pi, aux, pi);    
+    mpf_sqrt(e, e);
+    mpf_mul_ui(e, e, D);
+    mpf_div(pi, e, pi);    
     
     //Clear memory
-    mpf_clears(dep_a, dep_b, c, aux, dividend, divisor, NULL);
+    mpf_clears(dep_a, dep_b, dep_c, e, c, aux, NULL);
 }
 
 /*
@@ -120,11 +129,11 @@ void initDepA(mpf_t dep_a, int block_start){
  * so each thread calculates a part of pi.  
  */
 void ParallelChudnovskyAlgorithm(mpf_t pi, int num_iterations, int num_threads){
-    mpf_t aux, c;
+    mpf_t e, c;
     int block_size;
     
     block_size = (num_iterations + num_threads - 1) / num_threads;
-    mpf_init_set_ui(aux, E);
+    mpf_init_set_ui(e, E);
     mpf_init_set_ui(c, C);
     mpf_neg(c, c);
     mpf_pow_ui(c, c, 3);
@@ -135,22 +144,25 @@ void ParallelChudnovskyAlgorithm(mpf_t pi, int num_iterations, int num_threads){
     #pragma omp parallel 
     {   
         int thread_id, i, block_start, block_end, factor_a;
-        mpf_t local_pi, dep_a, dep_a_dividend, dep_a_divisor, dep_b, dividend, divisor;
+        mpf_t local_pi, dep_a, dep_a_dividend, dep_a_divisor, dep_b, dep_c, aux;
 
         thread_id = omp_get_thread_num();
         block_start = thread_id * block_size;
         block_end = (thread_id == num_threads - 1) ? num_iterations : block_start + block_size;
         
         mpf_init_set_ui(local_pi, 0);    // private thread pi
-        mpf_inits(dep_a, dep_b, dep_a_dividend, dep_a_divisor, dividend, divisor, NULL);
+        mpf_inits(dep_a, dep_b, dep_a_dividend, dep_a_divisor, aux, NULL);
         initDepA(dep_a, block_start);
         mpf_pow_ui(dep_b, c, block_start);
+        mpf_init_set_ui(dep_c, B);
+        mpf_mul_ui(dep_c, dep_c, block_start);
+        mpf_add_ui(dep_c, dep_c, A);
 
         //First Phase -> Working on a local variable        
         #pragma omp parallel for 
             for(i = block_start; i < block_end; i++){
-                ChudnovskyIteration(local_pi, i, dep_a, dep_b, dividend, divisor);
-                //Update dependencies
+                ChudnovskyIteration(local_pi, i, dep_a, dep_b, dep_c, aux);
+                //Update dep_a:
                 factor_a = 12 * i;
                 mpf_set_ui(dep_a_dividend, factor_a + 10);
                 mpf_mul_ui(dep_a_dividend, dep_a_dividend, factor_a + 6);
@@ -161,21 +173,25 @@ void ParallelChudnovskyAlgorithm(mpf_t pi, int num_iterations, int num_threads){
                 mpf_pow_ui(dep_a_divisor, dep_a_divisor ,3);
                 mpf_div(dep_a, dep_a_dividend, dep_a_divisor);
  
+                //Update dep_b:
                 mpf_mul(dep_b, dep_b, c);
+
+                //Update dep_c:
+                mpf_add_ui(dep_c, dep_c, B);
             }
 
         //Second Phase -> Accumulate the result in the global variable 
         #pragma omp critical
         mpf_add(pi, pi, local_pi);
         
-        //Clear memory
-        mpf_clears(local_pi, dep_a, dep_b, dep_a_dividend, dep_a_divisor, dividend, divisor, NULL);   
+        //Clear thread memory
+        mpf_clears(local_pi, dep_a, dep_b, dep_c, dep_a_dividend, dep_a_divisor, aux, NULL);   
     }
 
-    mpf_sqrt(aux, aux);
-    mpf_mul_ui(aux, aux, D);
-    mpf_div(pi, aux, pi);    
+    mpf_sqrt(e, e);
+    mpf_mul_ui(e, e, D);
+    mpf_div(pi, e, pi);    
     
     //Clear memory
-    mpf_clears(c, aux, NULL);
+    mpf_clears(c, e, NULL);
 }
