@@ -107,7 +107,7 @@ void ParallelBBPAlgorithm(mpf_t pi, int num_iterations, int num_threads){
         mpf_t local_pi, dep_m, quot_a, quot_b, quot_c, quot_d, aux;
 
         thread_id = omp_get_thread_num();
-        mpf_init_set_ui(local_pi, 0);       // private thread pi
+        mpf_init_set_ui(local_pi, 0);               // private thread pi
         mpf_init(dep_m);
         mpf_pow_ui(dep_m, quotient, thread_id);    // m = (1/16)^n                  
         mpf_inits(quot_a, quot_b, quot_c, quot_d, aux, NULL);

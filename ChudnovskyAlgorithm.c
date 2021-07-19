@@ -93,7 +93,7 @@ void SequentialChudnovskyAlgorithm(mpf_t pi, int num_iterations){
     mpf_div(pi, e, pi);    
     
     //Clear memory
-    mpf_clears(dep_a, dep_b, dep_c, e, c, aux, NULL);
+    mpf_clears(dep_a, dep_a_dividend, dep_a_divisor, dep_b, dep_c, e, c, aux, NULL);
 }
 
 /*

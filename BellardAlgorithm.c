@@ -162,7 +162,7 @@ void ParallelBellardAlgorithm(mpf_t pi, int num_iterations, int num_threads){
         #pragma omp critical
         mpf_add(pi, pi, local_pi);
 
-        //Clear memory
+        //Clear thread memory
         mpf_clears(local_pi, dep_m, a, b, c, d, e, f, g, aux, NULL);   
     }
 

@@ -67,8 +67,8 @@ void clearFactorials(mpf_t * factorials, int num_factorials){
 /*
  * An iteration of Chudnovsky formula
  */
-void ChudnovskyIterationV1(mpf_t pi, int n, mpf_t dep_a, mpf_t dep_b, mpf_t dep_c, mpf_t dep_d, 
-                                mpf_t dep_e, mpf_t dividend, mpf_t divisor){
+void ChudnovskyIterationV1(mpf_t pi, int n, mpf_t dep_a, mpf_t dep_b, mpf_t dep_c, 
+                        mpf_t dep_d, mpf_t dep_e, mpf_t dividend, mpf_t divisor){
     mpf_mul(dividend, dep_a, dep_e);
 
     mpf_mul(divisor, dep_b, dep_c);
@@ -116,7 +116,7 @@ void SequentialChudnovskyAlgorithmV1(mpf_t pi, int num_iterations){
     
     //Clear memory
     clearFactorials(factorials, num_factorials);
-    mpf_clears(dep_a, dep_b, dep_c, dep_d, c, e, dividend, divisor, NULL);
+    mpf_clears(dep_a, dep_b, dep_c, dep_d, dep_e, c, e, dividend, divisor, NULL);
 
 }
 
