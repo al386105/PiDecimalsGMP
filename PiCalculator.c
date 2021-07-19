@@ -41,7 +41,7 @@ void BBPAlgorithmV1(int num_threads, int precision){
     mpf_set_default_prec(precision * 8); 
     mpf_t pi;
     mpf_init_set_ui(pi, 0);
-    int num_iterations = precision;
+    int num_iterations = precision * 0.84;
     
     if(num_threads <= 1){ 
         SequentialBBPAlgorithmV1(pi, num_iterations);
@@ -59,7 +59,7 @@ void BBPAlgorithm(int num_threads, int precision){
     mpf_set_default_prec(precision * 8); 
     mpf_t pi;
     mpf_init_set_ui(pi, 0);
-    int num_iterations = precision;
+    int num_iterations = precision * 0.84;
     
     if(num_threads <= 1){ 
         SequentialBBPAlgorithm(pi, num_iterations);
@@ -78,7 +78,6 @@ void BellardAlgorithm(int num_threads, int precision){
     mpf_t pi;
     mpf_init_set_ui(pi, 0);
     int num_iterations = precision / 3;
-    //int num_iterations = (precision + 4 - 1) / 4;  //Division por exceso
 
     if(num_threads <= 1){ 
         SequentialBellardAlgorithm(pi, num_iterations);

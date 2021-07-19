@@ -150,7 +150,7 @@ void ParallelBellardAlgorithm(mpf_t pi, int num_iterations, int num_threads){
         } else {
             #pragma omp parallel for
                 for(i = thread_id; i < num_iterations; i+=num_threads){
-                    BellardIteration(local_pi, i, dep_m, a, b, c, d, e, f, g, aux,  dep_a, dep_b);
+                    BellardIteration(local_pi, i, dep_m, a, b, c, d, e, f, g, aux, dep_a, dep_b);
                     // Update dependencies for next iteration:
                     mpf_mul(dep_m, dep_m, jump);    
                     dep_a += jump_dep_a;
