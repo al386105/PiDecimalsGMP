@@ -18,11 +18,11 @@
  *                                                                                  *
  ************************************************************************************
  * Chudnovsky formula:                                                              *
- *     426880 sqrt(10005)                 (6n)! (545140134n + 13591409)             * 
+ *     426880 sqrt(10005)                 (6n)! (545140134n + 13591409)             *
  *    --------------------  = SUMMATORY( ----------------------------- ),  n >=0    *
  *            pi                            (n!)^3 (3n)! (-640320)^3n               *
  *                                                                                  *
- * Some operands of the formula are coded as:                                       *                                             *
+ * Some operands of the formula are coded as:                                       *
  *      dep_a_dividend = (6n)!                                                      *
  *      dep_a_divisor  = (n!)^3 (3n)!                                               *
  *      e              = 426880 sqrt(10005)                                         *
@@ -30,7 +30,7 @@
  ************************************************************************************
  * Chudnovsky formula dependencies:                                                 *
  *                     (6n)!         (12n + 10)(12n + 6)(12n + 2)                   *
- *      dep_a(n) = --------------- = ---------------------------- * dep_a(n-1)      * 
+ *      dep_a(n) = --------------- = ---------------------------- * dep_a(n-1)      *
  *                 ((n!)^3 (3n)!)              (n + 1)^3                            *
  *                                                                                  *
  *      dep_b(n) = (-640320)^3n = (-640320)^3(n-1) * (-640320)^3)                   *
@@ -97,7 +97,7 @@ void SequentialChudnovskyAlgorithm(mpf_t pi, int num_iterations){
 }
 
 /*
- * This method is used by ParallelChudnovskyAlgorithmV1 threads
+ * This method is used by ParallelChudnovskyAlgorithm threads
  * for computing the first value of dep_a
  */
 void initDepA(mpf_t dep_a, int block_start){
@@ -157,13 +157,13 @@ void ParallelChudnovskyAlgorithm(mpf_t pi, int num_iterations, int num_threads){
         mpf_init_set_ui(dep_c, B);
         mpf_mul_ui(dep_c, dep_c, block_start);
         mpf_add_ui(dep_c, dep_c, A);
+        factor_a = 12 * block_start;
 
         //First Phase -> Working on a local variable        
         #pragma omp parallel for 
             for(i = block_start; i < block_end; i++){
                 ChudnovskyIteration(local_pi, i, dep_a, dep_b, dep_c, aux);
                 //Update dep_a:
-                factor_a = 12 * i;
                 mpf_set_ui(dep_a_dividend, factor_a + 10);
                 mpf_mul_ui(dep_a_dividend, dep_a_dividend, factor_a + 6);
                 mpf_mul_ui(dep_a_dividend, dep_a_dividend, factor_a + 2);
@@ -172,7 +172,8 @@ void ParallelChudnovskyAlgorithm(mpf_t pi, int num_iterations, int num_threads){
                 mpf_set_ui(dep_a_divisor, i + 1);
                 mpf_pow_ui(dep_a_divisor, dep_a_divisor ,3);
                 mpf_div(dep_a, dep_a_dividend, dep_a_divisor);
- 
+                factor_a += 12;
+
                 //Update dep_b:
                 mpf_mul(dep_b, dep_b, c);
 

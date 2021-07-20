@@ -17,11 +17,11 @@
  *                                                                                  *
  ************************************************************************************
  * Chudnovsky formula:                                                              *
- *     426880 sqrt(10005)                 (6n)! (545140134n + 13591409)             * 
+ *     426880 sqrt(10005)                 (6n)! (545140134n + 13591409)             *
  *    --------------------  = SUMMATORY( ----------------------------- ),  n >=0    *
  *            pi                            (n!)^3 (3n)! (-640320)^3n               *
  *                                                                                  *
- * Some operands of the formula are coded as:                                       *                                             *
+ * Some operands of the formula are coded as:                                       *
  *      dividend = (6n)! (545140134n + 13591409)                                    *
  *      divisor  = (n!)^3 (3n)! (-640320)^3n                                        *
  *      e        = 426880 sqrt(10005)                                               *
@@ -31,7 +31,7 @@
  *              dep_a(n) = (6n)!                                                    *
  *              dep_b(n) = (n!)^3                                                   *
  *              dep_c(n) = (3n)!                                                    *
- *              dep_d(n) = (-640320)^(3n) = (-640320)^(3 (n-1)) * (-640320)^3       * 
+ *              dep_d(n) = (-640320)^(3n) = (-640320)^(3 (n-1)) * (-640320)^3       *
  *              dep_e(n) = (545140134n + 13591409) = dep_c(n - 1) + 545140134       *
  *                                                                                  *
  ************************************************************************************/
@@ -55,7 +55,7 @@ void getFactorials(mpf_t * factorials, int num_factorials){
 }
 
 /*
- * This method clears the factorials computed 
+ * This method clears the factorials computed and stored in mpf_t * factorials
  */
 void clearFactorials(mpf_t * factorials, int num_factorials){
     int i;
