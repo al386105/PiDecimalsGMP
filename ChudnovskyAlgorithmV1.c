@@ -85,7 +85,7 @@ void ChudnovskyIterationV1(mpf_t pi, int n, mpf_t dep_a, mpf_t dep_b, mpf_t dep_
  */
 void SequentialChudnovskyAlgorithmV1(mpf_t pi, int num_iterations){
     int num_factorials, i; 
-    num_factorials = num_iterations * 6;
+    num_factorials = (num_iterations * 6) + 2;
     mpf_t factorials[num_factorials + 1];
     getFactorials(factorials, num_factorials);   
 
@@ -148,11 +148,12 @@ void ParallelChudnovskyAlgorithmV1(mpf_t pi, int num_iterations, int num_threads
         int thread_id, i, block_start, block_end;
         mpf_t local_pi, dep_a, dep_b, dep_c, dep_d, dep_e, dividend, divisor;
 
-
         thread_id = omp_get_thread_num();
         block_start = thread_id * block_size;
-        block_end = (thread_id == num_threads - 1) ? num_iterations : block_start + block_size;
-        
+        if (block_start >= num_iterations) block_start = num_iterations;
+        block_end = block_start + block_size;
+        if (block_end >= num_iterations) block_end = num_iterations;
+
         mpf_init_set_ui(local_pi, 0);    // private thread pi
         mpf_inits(dividend, divisor, NULL);
         mpf_init_set(dep_a, factorials[block_start * 6]);
@@ -177,6 +178,7 @@ void ParallelChudnovskyAlgorithmV1(mpf_t pi, int num_iterations, int num_threads
                 mpf_mul(dep_d, dep_d, c);
                 mpf_add_ui(dep_e, dep_e, B);
             }
+
 
         //Second Phase -> Accumulate the result in the global variable 
         #pragma omp critical

@@ -28,9 +28,9 @@
  ************************************************************************************
  * Bailey Borwein Plouffe formula dependencies:                                     *
  *                                                                                  *
- *                        1            1                                            *
- *           dep_m(n) = ----- = ---------------                                     *
- *                       16^n   dep_m(n-1) * 16                                     *
+ *                        1                   1                                     *
+ *           dep_m(n) = ----- = -------------------------------------               *
+ *                       16^n   dep_m(n-num_threads) * 16^num_threads               *
  *                                                                                  *
  ************************************************************************************/
 
@@ -86,37 +86,36 @@ void SequentialBBPAlgorithm(mpf_t pi, int num_iterations){
 /*
  * Parallel Pi number calculation using the BBP algorithm
  * Multiple threads can be used
- * The number of iterations is divided in blocks, 
+ * The number of iterations is divided cyclically, 
  * so each thread calculates a part of Pi.  
  */
 void ParallelBBPAlgorithm(mpf_t pi, int num_iterations, int num_threads){
-    mpf_t quotient; 
+    mpf_t jump, quotient; 
 
     mpf_init_set_d(quotient, QUOTIENT);         // quotient = (1 / 16)   
+    mpf_init_set_ui(jump, 1);        
+    mpf_pow_ui(jump, quotient, num_threads);    // jump = (1/16)^num_threads
 
     //Set the number of threads 
     omp_set_num_threads(num_threads);
 
     #pragma omp parallel 
     {
-        int thread_id, i, block_size, block_start, block_end;
+        int thread_id, i;
         mpf_t local_pi, dep_m, quot_a, quot_b, quot_c, quot_d, aux;
 
         thread_id = omp_get_thread_num();
-        block_size = (num_iterations + num_threads - 1) / num_threads;
-        block_start = thread_id * block_size;
-        block_end = (thread_id == num_threads - 1) ? num_iterations : block_start + block_size;
         mpf_init_set_ui(local_pi, 0);               // private thread pi
         mpf_init(dep_m);
-        mpf_pow_ui(dep_m, quotient, block_start);    // m = (1/16)^n                  
+        mpf_pow_ui(dep_m, quotient, thread_id);    // m = (1/16)^n                  
         mpf_inits(quot_a, quot_b, quot_c, quot_d, aux, NULL);
 
         //First Phase -> Working on a local variable        
         #pragma omp parallel for 
-            for(i = block_start; i < block_end; i++){
+            for(i = thread_id; i < num_iterations; i+=num_threads){
                 BBPIteration(local_pi, i, dep_m, quot_a, quot_b, quot_c, quot_d, aux);
                 // Update dependencies:  
-                mpf_mul(dep_m, dep_m, quotient);
+                mpf_mul(dep_m, dep_m, jump);
             }
 
         //Second Phase -> Accumulate the result in the global variable
@@ -128,5 +127,5 @@ void ParallelBBPAlgorithm(mpf_t pi, int num_iterations, int num_threads){
     }
         
     //Clear memory
-    mpf_clear(quotient);
+    mpf_clears(jump, quotient, NULL);
 }
