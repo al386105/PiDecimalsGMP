@@ -123,45 +123,6 @@ void initDepA(mpf_t dep_a, int block_start){
 }
 
 /*
- * This method provides an optimal distribution for each thread
- * based on the Chudnovsky iterations analysis.
- * It returns an array of three integers:
- *   distribution[0] -> block size
- *   distribution[1] -> block start
- *   distribution[2] -> block end 
- */
-int * getDistribution(int num_threads, int thread_id, int num_iterations){
-    int * distribution, i; 
-    float work_rates[16][5] = { 59.50,  35.00,  21.35,  15.75,  12.77,
-                                40.50,  24.50,	14.35,  10.50,  8.57,
-                                0.00,   21.00,	12.25,  9.45,   7.53,
-                                0.00,   19.50,	11.55,  8.40,   6.83,
-                                0.00,   0.00,	10.85,  7.75,   6.30,
-                                0.00,   0.00,	10.30,  7.65,   5.95,
-                                0.00,   0.00,	10.00,  7.35,   5.88,
-                                0.00,   0.00,	9.35,   7.00,   5.77,
-                                0.00,   0.00,	0.00,   6.75,   5.56,
-                                0.00,	0.00,	0.00,   6.65,   5.25,
-                                0.00,	0.00,	0.00,   6.55,   5.14,
-                                0.00,	0.00,	0.00,   6.20,   5.08,
-                                0.00,	0.00,	0.00,   0.00,   5.01,
-                                0.00,	0.00,	0.00,   0.00,   4.97,
-                                0.00,	0.00,	0.00,   0.00,   4.80,
-                                0.00,	0.00,	0.00,   0.00,   4.59};
-
-    distribution = malloc(sizeof(int) * 3);
-    distribution[0] = work_rates[thread_id][num_threads / 4] * num_iterations / 100;
-    distribution[1] = 0;
-    for(i = 0; i < thread_id; i ++){
-        distribution[1] += work_rates[i][num_threads / 4] * num_iterations / 100;
-    }
-    distribution[2] = distribution[1] + distribution[0];
-    if (thread_id == num_threads -1) distribution[2] = num_iterations;
-    
-    return distribution;
-}
-
-/*
  * Parallel Pi number calculation using the Chudnovsky algorithm
  * Multiple threads can be used
  * The number of iterations is divided by blocks 
@@ -169,7 +130,9 @@ int * getDistribution(int num_threads, int thread_id, int num_iterations){
  */
 void ParallelChudnovskyAlgorithm(mpf_t pi, int num_iterations, int num_threads){
     mpf_t e, c;
-
+    int block_size;
+    
+    block_size = (num_iterations + num_threads - 1) / num_threads;
     mpf_init_set_ui(e, E);
     mpf_init_set_ui(c, C);
     mpf_neg(c, c);
@@ -180,14 +143,12 @@ void ParallelChudnovskyAlgorithm(mpf_t pi, int num_iterations, int num_threads){
 
     #pragma omp parallel 
     {   
-        int thread_id, i, block_size, block_start, block_end, factor_a, * distribution;
+        int thread_id, i, block_start, block_end, factor_a;
         mpf_t local_pi, dep_a, dep_a_dividend, dep_a_divisor, dep_b, dep_c, aux;
 
         thread_id = omp_get_thread_num();
-        distribution = getDistribution(num_threads, thread_id, num_iterations);
-        block_size = distribution[0];
-        block_start = distribution[1];
-        block_end = distribution[2];
+        block_start = thread_id * block_size;
+        block_end = (thread_id == num_threads - 1) ? num_iterations : block_start + block_size;
         
         mpf_init_set_ui(local_pi, 0);    // private thread pi
         mpf_inits(dep_a, dep_b, dep_a_dividend, dep_a_divisor, aux, NULL);
