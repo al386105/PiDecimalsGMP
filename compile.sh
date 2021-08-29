@@ -20,13 +20,13 @@ if [ "$#" -ne 1 ]; then
 fi
 
 if [ "$program" = "Sequential" ]; then
-	error=$(gcc -o parallel.x Sources/Sequential/*.c Sources/Common/*.c -lgmp 2>&1 1>/dev/null)
+	error=$(gcc -o sequential.x Sources/Sequential/*.c Sources/Common/*.c -lgmp 2>&1 1>/dev/null)
 
 elif [ "$program" = "OMP" ]; then
-	error=$(gcc -fopenmp -o parallel.x Sources/OMP/*.c Sources/Sequential/BBP.c Sources/Sequential/Bellard.c Sources/Sequential/BBP_v1.c Sources/Sequential/Chudnovsky_v1.c Sources/Sequential/Chudnovsky.c Sources/Common/*.c -lgmp 2>&1 1>/dev/null)
+	error=$(gcc -fopenmp -o parallelOMP.x Sources/OMP/*.c Sources/Sequential/BBP.c Sources/Sequential/Bellard.c Sources/Sequential/BBP_v1.c Sources/Sequential/Chudnovsky_v1.c Sources/Sequential/Chudnovsky.c Sources/Common/*.c -lgmp 2>&1 1>/dev/null)
 
 elif [ "$program" = "MPI" ]; then 
-	error=$(mpicc -fopenmp -o parallel.x Sources/MPI/*.c Sources/Sequential/BBP.c Sources/Sequential/Bellard.c Sources/Sequential/Chudnovsky_v1.c Sources/Sequential/Chudnovsky.c Sources/Common/*.c -lgmp 2>&1 1>/dev/null)
+	error=$(mpicc -fopenmp -o parallelMPI.x Sources/MPI/*.c Sources/Sequential/BBP.c Sources/Sequential/Bellard.c Sources/Sequential/Chudnovsky_v1.c Sources/Sequential/Chudnovsky.c Sources/Common/*.c -lgmp 2>&1 1>/dev/null)
 
 else
     errors
