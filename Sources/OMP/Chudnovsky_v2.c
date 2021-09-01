@@ -93,7 +93,8 @@ void Chudnovsky_algorithm_v2_OMP(mpf_t pi, int num_iterations, int num_threads){
 
         thread_id = omp_get_thread_num();
         block_start = thread_id * block_size;
-        block_end = (thread_id == num_threads - 1) ? num_iterations : block_start + block_size;
+        block_end = block_start + block_size;
+        if (block_end > num_iterations) block_end = num_iterations;
         
         mpf_init_set_ui(local_pi, 0);    // private thread pi
         mpf_inits(dep_a, dep_b, dep_a_dividend, dep_a_divisor, aux, NULL);

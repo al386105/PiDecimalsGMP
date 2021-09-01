@@ -22,7 +22,7 @@ int main(int argc, char **argv){
     //Print PiDecimals title 
     if(proc_id == 0){
         print_PiDecimals_title();
-        printf(" This version is done for clusters!\n");
+        printf("  This version is done for clusters!\n");
         printf("\n");
     }
 
