@@ -77,7 +77,10 @@ int * get_proc_distribution(int num_procs, int proc_id, int num_iterations){
         distribution[1] += work_rates[i][num_procs / 4] * num_iterations / 100;
     }
     distribution[2] = distribution[1] + distribution[0];
-    if (proc_id == num_procs -1) distribution[2] = num_iterations;
+    if (proc_id == num_procs -1){
+        distribution[2] = num_iterations;
+        distribution[0] = distribution[2] - distribution[1];
+    } 
     
     return distribution;
 }
