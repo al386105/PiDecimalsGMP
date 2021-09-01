@@ -58,7 +58,8 @@ void Bellard_algorithm_MPI(int num_procs, int proc_id, mpf_t pi,
 
     block_size = (num_iterations + num_procs - 1) / num_procs;
     block_start = proc_id * block_size;
-    block_end = (proc_id == num_procs - 1) ? num_iterations : block_start + block_size;
+    block_end = block_start + block_size;
+    if (block_end > num_iterations) block_end = num_iterations;
 
     mpf_init_set_ui(local_proc_pi, 0);
     mpf_init_set_ui(jump, 1); 

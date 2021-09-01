@@ -58,7 +58,9 @@ void BBP_algorithm_OMP(mpf_t pi, int num_iterations, int num_threads){
         thread_id = omp_get_thread_num();
         block_size = (num_iterations + num_threads - 1) / num_threads;
         block_start = thread_id * block_size;
-        block_end = (thread_id == num_threads - 1) ? num_iterations : block_start + block_size;
+        block_end = block_start + block_size;
+        if (block_end > num_iterations) block_end = num_iterations;
+
         mpf_init_set_ui(local_pi, 0);               // private thread pi
         mpf_init(dep_m);
         mpf_pow_ui(dep_m, quotient, block_start);    // m = (1/16)^n                  

@@ -11,6 +11,23 @@
 
 double gettimeofday();
 
+
+void check_errors_MPI(int num_procs, int precision, int num_iterations, int num_threads, int proc_id){
+    if (precision <= 0){
+        if(proc_id == 0) printf("  Precision should be greater than cero. \n\n");
+        MPI_Finalize();
+        exit(-1);
+    } 
+    if (num_iterations < (num_threads * num_procs)){
+        if(proc_id == 0){
+            printf("  The number of iterations required for the computation is too small to be solved with %d threads and %d procesess. \n", num_threads, num_procs);
+            printf("  Try using a greater precision or lower threads/processes number. \n\n");
+        }
+        MPI_Finalize();
+        exit(-1);
+    }
+}
+
 void print_running_properties_MPI(int num_procs, int precision, int num_iterations, int num_threads){
     printf("  Precision used: %d \n", precision);
     printf("  Iterations done: %d \n", num_iterations);
@@ -40,6 +57,7 @@ void calculate_Pi_MPI(int num_procs, int proc_id, int algorithm, int precision, 
     {
     case 0:
         num_iterations = precision * 0.84;
+        check_errors_MPI(num_procs, precision, num_iterations, num_threads, proc_id);
         if (proc_id == 0){
             printf("  Algorithm: BBP (Last version)\n");
             print_running_properties_MPI(num_procs, precision, num_iterations, num_threads);
@@ -49,6 +67,7 @@ void calculate_Pi_MPI(int num_procs, int proc_id, int algorithm, int precision, 
 
     case 1:
         num_iterations = precision / 3;
+        check_errors_MPI(num_procs, precision, num_iterations, num_threads, proc_id);
         if (proc_id == 0){
             printf("  Algorithm: Bellard \n");
             print_running_properties_MPI(num_procs, precision, num_iterations, num_threads);
@@ -58,6 +77,7 @@ void calculate_Pi_MPI(int num_procs, int proc_id, int algorithm, int precision, 
 
     case 2:
         num_iterations = (precision + 14 - 1) / 14;  //Division por exceso
+        check_errors_MPI(num_procs, precision, num_iterations, num_threads, proc_id);
         if (proc_id == 0){
             printf("  Algorithm: Chudnovsky  \n");
             print_running_properties_MPI(num_procs, precision, num_iterations, num_threads);
@@ -67,6 +87,7 @@ void calculate_Pi_MPI(int num_procs, int proc_id, int algorithm, int precision, 
 
     case 3:
         num_iterations = (precision + 14 - 1) / 14;  //Division por exceso
+        check_errors_MPI(num_procs, precision, num_iterations, num_threads, proc_id);
         if (proc_id == 0){
             printf("  Algorithm: Chudnovsky (Without all factorials) \n");
             print_running_properties_MPI(num_procs, precision, num_iterations, num_threads);

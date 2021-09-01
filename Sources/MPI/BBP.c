@@ -60,15 +60,14 @@ void BBP_algorithm_MPI(int num_procs, int proc_id, mpf_t pi,
 
     block_size = (num_iterations + num_procs - 1) / num_procs;
     block_start = proc_id * block_size;
-    block_end = (proc_id == num_procs - 1) ? num_iterations : block_start + block_size;
+    block_end = block_start + block_size;
+    if (block_end > num_iterations) block_end = num_iterations;
 
     mpf_init_set_ui(local_proc_pi, 0);          
     mpf_init_set_d(quotient, QUOTIENT);             // quotient = (1 / 16)   
     mpf_init_set_ui(jump, 1);        
     mpf_pow_ui(jump, quotient, num_threads);        // jump = (1/16)^num_threads
     
-
-
     //Set the number of threads 
     omp_set_num_threads(num_threads);
 

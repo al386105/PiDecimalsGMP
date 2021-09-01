@@ -11,6 +11,13 @@
 
 double gettimeofday();
 
+void check_errors(int precision, int num_iterations){
+    if (precision <= 0){
+        printf("  Precision should be greater than cero. \n\n");
+        exit(-1);
+    } 
+}
+
 void print_running_properties(int precision, int num_iterations){
     printf("  Precision used: %d \n", precision);
     printf("  Iterations done: %d \n", num_iterations);
@@ -32,6 +39,7 @@ void calculate_Pi(int algorithm, int precision){
     {
     case 0:
         num_iterations = precision * 0.84;
+        check_errors(precision, num_iterations);
         printf("  Algorithm: BBP (First version) \n");
         print_running_properties(precision, num_iterations);
         BBP_algorithm_v1(pi, num_iterations);
@@ -39,6 +47,7 @@ void calculate_Pi(int algorithm, int precision){
 
     case 1:
         num_iterations = precision * 0.84;
+        check_errors(precision, num_iterations);
         printf("  Algorithm: BBP (Last version)\n");
         print_running_properties(precision, num_iterations);
         BBP_algorithm(pi, num_iterations);
@@ -46,6 +55,7 @@ void calculate_Pi(int algorithm, int precision){
 
     case 2:
         num_iterations = precision / 3;
+        check_errors(precision, num_iterations);
         printf("  Algorithm: Bellard \n");
         print_running_properties(precision, num_iterations);
         Bellard_algorithm(pi, num_iterations);
@@ -53,6 +63,7 @@ void calculate_Pi(int algorithm, int precision){
     
     case 3:
         num_iterations = (precision + 14 - 1) / 14;  //Division por exceso
+        check_errors(precision, num_iterations);
         printf("  Algorithm: Chudnovsky  \n");
         print_running_properties(precision, num_iterations);
         Chudnovsky_algorithm_v1(pi, num_iterations);
@@ -60,6 +71,7 @@ void calculate_Pi(int algorithm, int precision){
     
     case 4:
         num_iterations = (precision + 14 - 1) / 14;  //Division por exceso
+        check_errors(precision, num_iterations);
         printf("  Algorithm: Chudnovsky (Last version) \n");
         print_running_properties(precision, num_iterations);
         Chudnovsky_algorithm(pi, num_iterations);

@@ -63,7 +63,8 @@ void Chudnovsky_algorithm_v1_MPI(int num_procs, int proc_id, mpf_t pi,
 
     block_size = (num_iterations + num_procs - 1) / num_procs;
     block_start = proc_id * block_size;
-    block_end = (proc_id == num_procs - 1) ? num_iterations : block_start + block_size;
+    block_end = block_start + block_size;
+    if (block_end > num_iterations) block_end = num_iterations;
 
     mpf_init_set_ui(local_proc_pi, 0);   
     mpf_init_set_ui(e, E);
@@ -82,7 +83,9 @@ void Chudnovsky_algorithm_v1_MPI(int num_procs, int proc_id, mpf_t pi,
         thread_id = omp_get_thread_num();
         thread_block_size = (block_size + num_threads - 1) / num_threads;
         thread_start = (thread_id * thread_block_size) + (block_size * proc_id);
-        thread_end = (thread_id == num_threads - 1) ? block_end : thread_start + thread_block_size;
+        thread_end = thread_start + thread_block_size;
+        if (thread_end > block_end) thread_end = block_end;
+
         
         mpf_init_set_ui(local_thread_pi, 0);    // private thread pi
         mpf_inits(dividend, divisor, NULL);
