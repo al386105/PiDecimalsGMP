@@ -11,7 +11,7 @@
 
 double gettimeofday();
 
-void check_errors_OMP(int precision, int num_iterations, int num_threads){
+void check_errors_OMP(int precision, int num_iterations, int num_threads, int algorithm){
     if (precision <= 0){
         printf("  Precision should be greater than cero. \n\n");
         exit(-1);
@@ -20,6 +20,14 @@ void check_errors_OMP(int precision, int num_iterations, int num_threads){
         printf("  The number of iterations required for the computation is too small to be solved with %d threads. \n", num_threads);
         printf("  Try using a greater precision or lower threads number. \n\n");
         exit(-1);
+    }
+    if (algorithm == 4){ 
+        // Last version of Chudnovksy is more efficient when threads and procs are 2 or multiples of four
+        if (num_threads >= 2 && num_threads % 4 != 0){
+            printf(  "The last version of Chudnovksy is not eficient with %d threads. \n", num_threads);
+            printf("  Try using two threads or multiples of four (4, 8, 12, 16, ..) \n\n");
+            exit(-1);
+        } 
     }
 }
 
@@ -45,7 +53,7 @@ void calculate_Pi_OMP(int algorithm, int precision, int num_threads){
     {
     case 0:
         num_iterations = precision * 0.84;
-        check_errors_OMP(precision, num_iterations, num_threads);
+        check_errors_OMP(precision, num_iterations, num_threads, algorithm);
         printf("  Algorithm: BBP (First version) \n");
         print_running_properties_OMP(precision, num_iterations, num_threads);
         BBP_algorithm_v1_OMP(pi, num_iterations, num_threads);
@@ -53,7 +61,7 @@ void calculate_Pi_OMP(int algorithm, int precision, int num_threads){
 
     case 1:
         num_iterations = precision * 0.84;
-        check_errors_OMP(precision, num_iterations, num_threads);
+        check_errors_OMP(precision, num_iterations, num_threads, algorithm);
         printf("  Algorithm: BBP (Last version)\n");
         print_running_properties_OMP(precision, num_iterations, num_threads);      
         BBP_algorithm_OMP(pi, num_iterations, num_threads);
@@ -61,7 +69,7 @@ void calculate_Pi_OMP(int algorithm, int precision, int num_threads){
 
     case 2:
         num_iterations = precision / 3;
-        check_errors_OMP(precision, num_iterations, num_threads);
+        check_errors_OMP(precision, num_iterations, num_threads, algorithm);
         printf("  Algorithm: Bellard \n");
         print_running_properties_OMP(precision, num_iterations, num_threads);
         Bellard_algorithm_OMP(pi, num_iterations, num_threads);
@@ -69,7 +77,7 @@ void calculate_Pi_OMP(int algorithm, int precision, int num_threads){
 
     case 3:
         num_iterations = (precision + 14 - 1) / 14;  //Division por exceso
-        check_errors_OMP(precision, num_iterations, num_threads);
+        check_errors_OMP(precision, num_iterations, num_threads, algorithm);
         printf("  Algorithm: Chudnovsky  \n");
         print_running_properties_OMP(precision, num_iterations, num_threads);
         Chudnovsky_algorithm_v1_OMP(pi, num_iterations, num_threads);
@@ -77,7 +85,7 @@ void calculate_Pi_OMP(int algorithm, int precision, int num_threads){
 
     case 4:
         num_iterations = (precision + 14 - 1) / 14;  //Division por exceso
-        check_errors_OMP(precision, num_iterations, num_threads);
+        check_errors_OMP(precision, num_iterations, num_threads, algorithm);
         printf("  Algorithm: Chudnovsky (Last version) \n");
         print_running_properties_OMP(precision, num_iterations, num_threads);
         Chudnovsky_algorithm_OMP(pi, num_iterations, num_threads);
