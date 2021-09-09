@@ -12,7 +12,7 @@
 double gettimeofday();
 
 
-void check_errors_MPI(int num_procs, int precision, int num_iterations, int num_threads, int proc_id){
+void check_errors_MPI(int num_procs, int precision, int num_iterations, int num_threads, int proc_id, int algorithm){
     if (precision <= 0){
         if(proc_id == 0) printf("  Precision should be greater than cero. \n\n");
         MPI_Finalize();
@@ -25,6 +25,14 @@ void check_errors_MPI(int num_procs, int precision, int num_iterations, int num_
         }
         MPI_Finalize();
         exit(-1);
+    }
+        if (algorithm == 4){ 
+            // Last version of Chudnovksy is more efficient when threads and procs are 2 or multiples of four
+            if (num_procs > 2 && num_procs % 4 != 0){
+                printf("  The last version of Chudnovksy is not eficient with %d procs. \n", num_procs);
+                printf("  Try using two nodes or multiples of four (4, 8, 12, 16, ..) \n\n");
+                exit(-1);
+            } 
     }
 }
 
@@ -57,7 +65,7 @@ void calculate_Pi_MPI(int num_procs, int proc_id, int algorithm, int precision, 
     {
     case 0:
         num_iterations = precision * 0.84;
-        check_errors_MPI(num_procs, precision, num_iterations, num_threads, proc_id);
+        check_errors_MPI(num_procs, precision, num_iterations, num_threads, proc_id, algorithm);
         if (proc_id == 0){
             printf("  Algorithm: BBP (Last version)\n");
             print_running_properties_MPI(num_procs, precision, num_iterations, num_threads);
@@ -67,7 +75,7 @@ void calculate_Pi_MPI(int num_procs, int proc_id, int algorithm, int precision, 
 
     case 1:
         num_iterations = precision / 3;
-        check_errors_MPI(num_procs, precision, num_iterations, num_threads, proc_id);
+        check_errors_MPI(num_procs, precision, num_iterations, num_threads, proc_id, algorithm);
         if (proc_id == 0){
             printf("  Algorithm: Bellard \n");
             print_running_properties_MPI(num_procs, precision, num_iterations, num_threads);
@@ -77,7 +85,7 @@ void calculate_Pi_MPI(int num_procs, int proc_id, int algorithm, int precision, 
 
     case 2:
         num_iterations = (precision + 14 - 1) / 14;  //Division por exceso
-        check_errors_MPI(num_procs, precision, num_iterations, num_threads, proc_id);
+        check_errors_MPI(num_procs, precision, num_iterations, num_threads, proc_id, algorithm);
         if (proc_id == 0){
             printf("  Algorithm: Chudnovsky  \n");
             print_running_properties_MPI(num_procs, precision, num_iterations, num_threads);
@@ -87,7 +95,7 @@ void calculate_Pi_MPI(int num_procs, int proc_id, int algorithm, int precision, 
 
     case 3:
         num_iterations = (precision + 14 - 1) / 14;  //Division por exceso
-        check_errors_MPI(num_procs, precision, num_iterations, num_threads, proc_id);
+        check_errors_MPI(num_procs, precision, num_iterations, num_threads, proc_id, algorithm);
         if (proc_id == 0){
             printf("  Algorithm: Chudnovsky (Without all factorials) \n");
             print_running_properties_MPI(num_procs, precision, num_iterations, num_threads);

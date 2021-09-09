@@ -46,15 +46,18 @@
  * so each thread calculates a part of Pi.  
  */
 void Bellard_algorithm_OMP(mpf_t pi, int num_iterations, int num_threads){
-    mpf_t ONE;
-    mpf_init_set_ui(ONE, 1);
+    mpf_t jump; 
+
+    mpf_init_set_ui(jump, 1); 
+    mpf_div_ui(jump, jump, 1024);
+    mpf_pow_ui(jump, jump, num_threads);
 
     //Set the number of threads 
     omp_set_num_threads(num_threads);
 
     #pragma omp parallel 
     {
-        int thread_id, i, dep_a, dep_b, jump_dep_a, jump_dep_b, next_i;
+        int thread_id, i, dep_a, dep_b, jump_dep_a, jump_dep_b;
         mpf_t local_pi, dep_m, a, b, c, d, e, f, g, aux;
 
         thread_id = omp_get_thread_num();
@@ -63,23 +66,32 @@ void Bellard_algorithm_OMP(mpf_t pi, int num_iterations, int num_threads){
         dep_b = thread_id * 10;
         jump_dep_a = 4 * num_threads;
         jump_dep_b = 10 * num_threads;
-        mpf_init(dep_m);
-        mpf_mul_2exp(dep_m, ONE, 10 * thread_id);
-        mpf_div(dep_m, ONE, dep_m);
+        mpf_init_set_ui(dep_m, 1);
+        mpf_div_ui(dep_m, dep_m, 1024);
+        mpf_pow_ui(dep_m, dep_m, thread_id);        // dep_m = ((-1)^n)/1024)
         if(thread_id % 2 != 0) mpf_neg(dep_m, dep_m);                   
         mpf_inits(a, b, c, d, e, f, g, aux, NULL);
 
         //First Phase -> Working on a local variable
-        #pragma omp parallel for 
-            for(i = thread_id; i < num_iterations; i+=num_threads){
-                Bellard_iteration(local_pi, i, dep_m, a, b, c, d, e, f, g, aux, dep_a, dep_b);
-                // Update dependencies for next iteration:
-                next_i = i + num_threads;
-                mpf_mul_2exp(dep_m, ONE, 10 * next_i);
-                mpf_div(dep_m, ONE, dep_m);
-                if (next_i % 2 != 0) mpf_neg(dep_m, dep_m); 
-                dep_a += jump_dep_a;
-                dep_b += jump_dep_b;  
+        if(num_threads % 2 != 0){
+            #pragma omp parallel for 
+                for(i = thread_id; i < num_iterations; i+=num_threads){
+                    Bellard_iteration(local_pi, i, dep_m, a, b, c, d, e, f, g, aux, dep_a, dep_b);
+                    // Update dependencies for next iteration:
+                    mpf_mul(dep_m, dep_m, jump); 
+                    mpf_neg(dep_m, dep_m); 
+                    dep_a += jump_dep_a;
+                    dep_b += jump_dep_b;  
+                }
+        } else {
+            #pragma omp parallel for
+                for(i = thread_id; i < num_iterations; i+=num_threads){
+                    Bellard_iteration(local_pi, i, dep_m, a, b, c, d, e, f, g, aux, dep_a, dep_b);
+                    // Update dependencies for next iteration:
+                    mpf_mul(dep_m, dep_m, jump);    
+                    dep_a += jump_dep_a;
+                    dep_b += jump_dep_b;  
+                }
             }
 
         //Second Phase -> Accumulate the result in the global variable
@@ -91,7 +103,8 @@ void Bellard_algorithm_OMP(mpf_t pi, int num_iterations, int num_threads){
     }
 
     mpf_div_ui(pi, pi, 64);
-
-    mpf_clear(ONE);        
+        
+    //Clear memory
+    mpf_clear(jump);
 }
 

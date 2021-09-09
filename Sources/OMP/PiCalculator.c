@@ -23,8 +23,8 @@ void check_errors_OMP(int precision, int num_iterations, int num_threads, int al
     }
     if (algorithm == 4){ 
         // Last version of Chudnovksy is more efficient when threads and procs are 2 or multiples of four
-        if (num_threads >= 2 && num_threads % 4 != 0){
-            printf(  "The last version of Chudnovksy is not eficient with %d threads. \n", num_threads);
+        if (num_threads > 2 && num_threads % 4 != 0){
+            printf("  The last version of Chudnovksy is not eficient with %d threads. \n", num_threads);
             printf("  Try using two threads or multiples of four (4, 8, 12, 16, ..) \n\n");
             exit(-1);
         } 
