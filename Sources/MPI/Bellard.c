@@ -3,7 +3,7 @@
 #include <gmp.h>
 #include <omp.h>
 #include "mpi.h"
-#include "../../Headers/Sequential/Bellard.h"
+#include "../../Headers/Sequential/Bellard_v1.h"
 #include "../../Headers/MPI/OperationsMPI.h"
 
 
@@ -54,7 +54,7 @@
 void Bellard_algorithm_MPI(int num_procs, int proc_id, mpf_t pi, 
                                 int num_iterations, int num_threads){
     int block_size, block_start, block_end, position, packet_size;
-    mpf_t local_proc_pi, jump;
+    mpf_t local_proc_pi, ONE;
 
     block_size = (num_iterations + num_procs - 1) / num_procs;
     block_start = proc_id * block_size;
@@ -62,16 +62,14 @@ void Bellard_algorithm_MPI(int num_procs, int proc_id, mpf_t pi,
     if (block_end > num_iterations) block_end = num_iterations;
 
     mpf_init_set_ui(local_proc_pi, 0);
-    mpf_init_set_ui(jump, 1); 
-    mpf_div_ui(jump, jump, 1024);
-    mpf_pow_ui(jump, jump, num_threads);
+    mpf_init_set_ui(ONE, 1);
 
     //Set the number of threads 
     omp_set_num_threads(num_threads);
 
     #pragma omp parallel 
     {
-        int thread_id, i, dep_a, dep_b, jump_dep_a, jump_dep_b;
+        int thread_id, i, dep_a, dep_b, jump_dep_a, jump_dep_b, next_i;
         mpf_t local_thread_pi, dep_m, a, b, c, d, e, f, g, aux;
 
         thread_id = omp_get_thread_num();
@@ -80,32 +78,23 @@ void Bellard_algorithm_MPI(int num_procs, int proc_id, mpf_t pi,
         dep_b = (block_start + thread_id) * 10;
         jump_dep_a = 4 * num_threads;
         jump_dep_b = 10 * num_threads;
-        mpf_init_set_ui(dep_m, 1);
-        mpf_div_ui(dep_m, dep_m, 1024);
-        mpf_pow_ui(dep_m, dep_m, block_start + thread_id);  // dep_m = ((-1)^n)/1024)
-        if((block_start + thread_id) % 2 != 0) mpf_neg(dep_m, dep_m);                   
+        mpf_init(dep_m);
+        mpf_mul_2exp(dep_m, ONE, 10 * (block_start + thread_id));
+        mpf_div(dep_m, ONE, dep_m);
+        if((thread_id + block_start) % 2 != 0) mpf_neg(dep_m, dep_m);                     
         mpf_inits(a, b, c, d, e, f, g, aux, NULL);
 
         //First Phase -> Working on a local variable
-        if(num_threads % 2 != 0){
-            #pragma omp parallel for 
-                for(i = block_start + thread_id; i < block_end; i+=num_threads){
-                    Bellard_iteration(local_thread_pi, i, dep_m, a, b, c, d, e, f, g, aux, dep_a, dep_b);
-                    // Update dependencies for next iteration:
-                    mpf_mul(dep_m, dep_m, jump); 
-                    mpf_neg(dep_m, dep_m); 
-                    dep_a += jump_dep_a;
-                    dep_b += jump_dep_b;     
-                }
-        } else {
-            #pragma omp parallel for
-                for(i = block_start + thread_id; i < block_end; i+=num_threads){
-                    Bellard_iteration(local_thread_pi, i, dep_m, a, b, c, d, e, f, g, aux, dep_a, dep_b);
-                    // Update dependencies for next iteration:
-                    mpf_mul(dep_m, dep_m, jump);    
-                    dep_a += jump_dep_a;
-                    dep_b += jump_dep_b;    
-                }
+        #pragma omp parallel for 
+            for(i = block_start + thread_id; i < block_end; i+=num_threads){
+                Bellard_iteration(local_thread_pi, i, dep_m, a, b, c, d, e, f, g, aux, dep_a, dep_b);
+                // Update dependencies for next iteration:
+                next_i = i + num_threads;
+                mpf_mul_2exp(dep_m, ONE, 10 * next_i);
+                mpf_div(dep_m, ONE, dep_m);
+                if (next_i % 2 != 0) mpf_neg(dep_m, dep_m); 
+                dep_a += jump_dep_a;
+                dep_b += jump_dep_b;     
             }
 
         //Second Phase -> Accumulate the result in the global variable
@@ -139,6 +128,6 @@ void Bellard_algorithm_MPI(int num_procs, int proc_id, mpf_t pi,
 
     //Clear memory
     MPI_Op_free(&add_op);
-    mpf_clears(local_proc_pi, jump, NULL);       
+    mpf_clears(local_proc_pi, ONE, NULL);       
 }
 

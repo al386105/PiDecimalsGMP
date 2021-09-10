@@ -4,6 +4,7 @@
 #include <time.h>
 #include "../../Headers/OMP/BBP.h"
 #include "../../Headers/OMP/BBP_v1.h"
+#include "../../Headers/OMP/Bellard_v1.h"
 #include "../../Headers/OMP/Bellard.h"
 #include "../../Headers/OMP/Chudnovsky_v1.h"
 #include "../../Headers/OMP/Chudnovsky.h"
@@ -21,7 +22,7 @@ void check_errors_OMP(int precision, int num_iterations, int num_threads, int al
         printf("  Try using a greater precision or lower threads number. \n\n");
         exit(-1);
     }
-    if (algorithm == 4){ 
+    if (algorithm == 5){ 
         // Last version of Chudnovksy is more efficient when threads and procs are 2 or multiples of four
         if (num_threads > 2 && num_threads % 4 != 0){
             printf("  The last version of Chudnovksy is not eficient with %d threads. \n", num_threads);
@@ -70,12 +71,20 @@ void calculate_Pi_OMP(int algorithm, int precision, int num_threads){
     case 2:
         num_iterations = precision / 3;
         check_errors_OMP(precision, num_iterations, num_threads, algorithm);
-        printf("  Algorithm: Bellard \n");
+        printf("  Algorithm: Bellard (First version) \n");
+        print_running_properties_OMP(precision, num_iterations, num_threads);
+        Bellard_algorithm_v1_OMP(pi, num_iterations, num_threads);
+        break;
+
+    case 3:
+        num_iterations = precision / 3;
+        check_errors_OMP(precision, num_iterations, num_threads, algorithm);
+        printf("  Algorithm: Bellard (Last version) \n");
         print_running_properties_OMP(precision, num_iterations, num_threads);
         Bellard_algorithm_OMP(pi, num_iterations, num_threads);
         break;
 
-    case 3:
+    case 4:
         num_iterations = (precision + 14 - 1) / 14;  //Division por exceso
         check_errors_OMP(precision, num_iterations, num_threads, algorithm);
         printf("  Algorithm: Chudnovsky  \n");
@@ -83,7 +92,7 @@ void calculate_Pi_OMP(int algorithm, int precision, int num_threads){
         Chudnovsky_algorithm_v1_OMP(pi, num_iterations, num_threads);
         break;
 
-    case 4:
+    case 5:
         num_iterations = (precision + 14 - 1) / 14;  //Division por exceso
         check_errors_OMP(precision, num_iterations, num_threads, algorithm);
         printf("  Algorithm: Chudnovsky (Last version) \n");
@@ -95,9 +104,10 @@ void calculate_Pi_OMP(int algorithm, int precision, int num_threads){
         printf("  Algorithm selected is not correct. Try with: \n");
         printf("      algorithm == 0 -> BBP (First version) \n");
         printf("      algorithm == 1 -> BBP (Last version) \n");
-        printf("      algorithm == 2 -> Bellard \n");
-        printf("      algorithm == 3 -> Chudnovsky (Computing all factorials) \n");
-        printf("      algorithm == 4 -> Chudnovsky (Does not compute all factorials) \n");
+        printf("      algorithm == 2 -> Bellard (First version) \n");
+        printf("      algorithm == 3 -> Bellard (Last version)\n");
+        printf("      algorithm == 4 -> Chudnovsky (Computing all factorials) \n");
+        printf("      algorithm == 5 -> Chudnovsky (Does not compute all factorials) \n");
         printf("\n");
         exit(-1);
         break;

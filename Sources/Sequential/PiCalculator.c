@@ -4,6 +4,7 @@
 #include <time.h>
 #include "../../Headers/Sequential/BBP.h"
 #include "../../Headers/Sequential/BBP_v1.h"
+#include "../../Headers/Sequential/Bellard_v1.h"
 #include "../../Headers/Sequential/Bellard.h"
 #include "../../Headers/Sequential/Chudnovsky_v1.h"
 #include "../../Headers/Sequential/Chudnovsky.h"
@@ -56,20 +57,28 @@ void calculate_Pi(int algorithm, int precision){
     case 2:
         num_iterations = precision / 3;
         check_errors(precision, num_iterations);
-        printf("  Algorithm: Bellard \n");
+        printf("  Algorithm: Bellard (First version) \n");
+        print_running_properties(precision, num_iterations);
+        Bellard_algorithm_v1(pi, num_iterations);
+        break;
+
+    case 3:
+        num_iterations = precision / 3;
+        check_errors(precision, num_iterations);
+        printf("  Algorithm: Bellard (Last version) \n");
         print_running_properties(precision, num_iterations);
         Bellard_algorithm(pi, num_iterations);
         break;
     
-    case 3:
+    case 4:
         num_iterations = (precision + 14 - 1) / 14;  //Division por exceso
         check_errors(precision, num_iterations);
-        printf("  Algorithm: Chudnovsky  \n");
+        printf("  Algorithm: Chudnovsky (First version) \n");
         print_running_properties(precision, num_iterations);
         Chudnovsky_algorithm_v1(pi, num_iterations);
         break;
     
-    case 4:
+    case 5:
         num_iterations = (precision + 14 - 1) / 14;  //Division por exceso
         check_errors(precision, num_iterations);
         printf("  Algorithm: Chudnovsky (Last version) \n");
@@ -81,9 +90,10 @@ void calculate_Pi(int algorithm, int precision){
         printf("  Algorithm selected is not correct. Try with: \n");
         printf("      algorithm == 0 -> BBP (First version) \n");
         printf("      algorithm == 1 -> BBP (Last version) \n");
-        printf("      algorithm == 2 -> Bellard \n");
-        printf("      algorithm == 3 -> Chudnovsky (Computing all factorials) \n");
-        printf("      algorithm == 4 -> Chudnovsky (Does not compute all factorials) \n");
+        printf("      algorithm == 2 -> Bellard (First version)\n");
+        printf("      algorithm == 3 -> Bellard (Last version)\n");
+        printf("      algorithm == 4 -> Chudnovsky (Computing all factorials) \n");
+        printf("      algorithm == 5 -> Chudnovsky (Does not compute all factorials) \n");
         printf("\n");
         exit(-1);
         break;

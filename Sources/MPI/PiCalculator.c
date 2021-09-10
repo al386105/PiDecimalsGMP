@@ -5,7 +5,6 @@
 #include "mpi.h"
 #include "../../Headers/MPI/BBP.h"
 #include "../../Headers/MPI/Bellard.h"
-#include "../../Headers/MPI/Chudnovsky_v1.h"
 #include "../../Headers/MPI/Chudnovsky.h"
 #include "../../Headers/Common/Check_decimals.h"
 
@@ -26,7 +25,7 @@ void check_errors_MPI(int num_procs, int precision, int num_iterations, int num_
         MPI_Finalize();
         exit(-1);
     }
-        if (algorithm == 4){ 
+        if (algorithm == 2){ 
             // Last version of Chudnovksy is more efficient when threads and procs are 2 or multiples of four
             if (num_procs > 2 && num_procs % 4 != 0){
                 printf("  The last version of Chudnovksy is not eficient with %d procs. \n", num_procs);
@@ -87,16 +86,6 @@ void calculate_Pi_MPI(int num_procs, int proc_id, int algorithm, int precision, 
         num_iterations = (precision + 14 - 1) / 14;  //Division por exceso
         check_errors_MPI(num_procs, precision, num_iterations, num_threads, proc_id, algorithm);
         if (proc_id == 0){
-            printf("  Algorithm: Chudnovsky  \n");
-            print_running_properties_MPI(num_procs, precision, num_iterations, num_threads);
-        } 
-        Chudnovsky_algorithm_v1_MPI(num_procs, proc_id, pi, num_iterations, num_threads);
-        break;
-
-    case 3:
-        num_iterations = (precision + 14 - 1) / 14;  //Division por exceso
-        check_errors_MPI(num_procs, precision, num_iterations, num_threads, proc_id, algorithm);
-        if (proc_id == 0){
             printf("  Algorithm: Chudnovsky (Without all factorials) \n");
             print_running_properties_MPI(num_procs, precision, num_iterations, num_threads);
         } 
@@ -108,8 +97,7 @@ void calculate_Pi_MPI(int num_procs, int proc_id, int algorithm, int precision, 
             printf("  Algorithm selected is not correct. Try with: \n");
             printf("      algorithm == 0 -> BBP (Last version) \n");
             printf("      algorithm == 1 -> Bellard \n");
-            printf("      algorithm == 2 -> Chudnovsky (Computing all factorials) \n");
-            printf("      algorithm == 3 -> Chudnovsky (Does not compute all factorials) \n");
+            printf("      algorithm == 2 -> Chudnovsky (Does not compute all factorials) \n");
             printf("\n");
         } 
         MPI_Finalize();

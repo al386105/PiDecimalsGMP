@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <gmp.h>
 #include <omp.h>
-#include "../../Headers/Sequential/Bellard.h"
-
+#include "../../Headers/Sequential/Bellard_v1.h"
 
 
 /************************************************************************************
@@ -45,7 +44,7 @@
  * The number of iterations is divided cyclically, 
  * so each thread calculates a part of Pi.  
  */
-void Bellard_algorithm_OMP(mpf_t pi, int num_iterations, int num_threads){
+void Bellard_algorithm_v1_OMP(mpf_t pi, int num_iterations, int num_threads){
     mpf_t jump; 
 
     mpf_init_set_ui(jump, 1); 

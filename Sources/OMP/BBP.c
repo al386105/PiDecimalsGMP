@@ -60,8 +60,6 @@ void BBP_algorithm_OMP(mpf_t pi, int num_iterations, int num_threads){
         block_start = thread_id * block_size;
         block_end = block_start + block_size;
         if (block_end > num_iterations) block_end = num_iterations;
-	#pragma omp critical
-	printf("HOLA SOY LA HEBRA TH%d  EMPIEZO EN %d Y TERMINO EN %d\n", thread_id, block_start, block_end);
 
         mpf_init_set_ui(local_pi, 0);               // private thread pi
         mpf_init(dep_m);

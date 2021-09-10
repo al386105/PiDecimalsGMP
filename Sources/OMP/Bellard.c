@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <gmp.h>
 #include <omp.h>
-#include "../../Headers/Sequential/Bellard.h"
+#include "../../Headers/Sequential/Bellard_v1.h"
 
 
 
