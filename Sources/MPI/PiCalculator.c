@@ -27,9 +27,9 @@ void check_errors_MPI(int num_procs, int precision, int num_iterations, int num_
     }
         if (algorithm == 2){ 
             // Last version of Chudnovksy is more efficient when threads and procs are 2 or multiples of four
-            if (num_procs > 2 && num_procs % 4 != 0){
+            if (num_procs > 8 ){
                 printf("  The last version of Chudnovksy is not eficient with %d procs. \n", num_procs);
-                printf("  Try using two nodes or multiples of four (4, 8, 12, 16, ..) \n\n");
+                printf("  Try using 8 or less procs \n\n");
                 exit(-1);
             } 
     }
