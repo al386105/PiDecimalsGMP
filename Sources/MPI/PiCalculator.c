@@ -26,10 +26,11 @@ void check_errors_MPI(int num_procs, int precision, int num_iterations, int num_
         exit(-1);
     }
         if (algorithm == 2){ 
-            // Last version of Chudnovksy is more efficient when threads and procs are 2 or multiples of four
-            if (num_procs > 8 ){
-                printf("  The last version of Chudnovksy is not eficient with %d procs. \n", num_procs);
-                printf("  Try using 8 or less procs \n\n");
+            // Last version of Chudnovksy is more efficient when total threads are 2 or multiples of four
+            if ((num_procs * num_threads) > 2 && (num_procs * num_threads) % 4 != 0){
+                printf("  The last version of Chudnovksy is not eficient with %d processes and %d threads. \n", num_procs, num_threads);
+                printf("  Try using 2 or multiples of four for the total threads\n\n");
+                MPI_Finalize();
                 exit(-1);
             } 
     }
