@@ -16,8 +16,7 @@
  * Miguel Pardo Navarro. 17/07/2021                                                 *
  * Chudnovsky formula implementation                                                *
  * This version does not computes all the factorials                                *
- * It implements a sequential method and another one that can use multiple          *
- * processes and threads in hybrid way.                                             *
+ * This version allows computing Pi using processes and threads in hybrid way.      *
  *                                                                                  *
  ************************************************************************************
  * Chudnovsky formula:                                                              *

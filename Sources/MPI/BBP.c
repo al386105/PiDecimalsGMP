@@ -12,9 +12,8 @@
 
 /************************************************************************************
  * Miguel Pardo Navarro. 17/07/2021                                                 *
- * Last version of Bailey Borwein Plouffe formula implementation                    *
- * It implements a sequential method and another one that can use multiple          *
- * processes and threads in hybrid way.                                             *
+ * Bailey Borwein Plouffe formula implementation                                    *
+ * This version allows computing Pi using processes and threads in hybrid way.      *
  *                                                                                  *
  ************************************************************************************
  * Bailey Borwein Plouffe formula:                                                  *

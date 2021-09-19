@@ -6,8 +6,8 @@
 
 /************************************************************************************
  * Miguel Pardo Navarro. 17/07/2021                                                 *
- * First version of Bailey Borwein Plouffe formula implementation                   *
- * It implements a single-threaded method and another that can use multiple threads *
+ * First version of Bailey Borwein Plouffe formula                                  *
+ * It computes pi with a single thread                                              *
  *                                                                                  *
  ************************************************************************************
  * Bailey Borwein Plouffe formula:                                                  *

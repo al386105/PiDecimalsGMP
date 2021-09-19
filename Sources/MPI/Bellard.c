@@ -11,8 +11,7 @@
 /************************************************************************************
  * Miguel Pardo Navarro. 17/07/2021                                                 *
  * Bellard formula implementation                                                   *
- * It implements a sequential method and another one that can use multiple          *
- * processes and threads in hybrid way.                                             *
+ * This version allows computing Pi using processes and threads in hybrid way.      *                                             *
  *                                                                                  *
  ************************************************************************************
  * Bellard formula:                                                                 *

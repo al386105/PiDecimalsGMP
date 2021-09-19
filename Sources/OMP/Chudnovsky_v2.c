@@ -15,7 +15,7 @@
  * Miguel Pardo Navarro. 17/07/2021                                                 *
  * Chudnovsky formula implementation                                                *
  * This version does not computes all the factorials                                *
- * It implements a single-threaded method and another that can use multiple threads *
+ * It allows to compute pi using multiple threads                                   *
  *                                                                                  *
  ************************************************************************************
  * Chudnovsky formula:                                                              *

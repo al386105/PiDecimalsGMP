@@ -9,7 +9,7 @@
 /************************************************************************************
  * Miguel Pardo Navarro. 17/07/2021                                                 *
  * Bellard formula implementation                                                   *
- * It implements a single-threaded method and another that can use multiple threads *
+ * It allows to compute pi using multiple threads                                   *
  *                                                                                  *
  ************************************************************************************
  * Bellard formula:                                                                 *
